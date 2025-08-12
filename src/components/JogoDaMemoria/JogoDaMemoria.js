@@ -1,4 +1,5 @@
 import React, { useState, useEffect } from 'react';
+import { Link } from 'react-router-dom';
 import Settings from './Settings';
 import './JogoDaMemoria.css';
 
@@ -63,7 +64,7 @@ const JogoDaMemoria = () => {
     useEffect(() => {
         if (matchedCards.length > 0 && matchedCards.length === cardContent.length / 2) {
             setGameActive(false);
-           
+            // Removido o alertbox
         }
     }, [matchedCards, cardContent]);
     
@@ -87,6 +88,7 @@ const JogoDaMemoria = () => {
 
     return (
         <div className="memory-game-container">
+            <Link to="/" className="home-button"></Link>
             <button className="settings-button" onClick={() => setShowSettings(true)}></button>
 
             <h1 className="game-title">Jogo da Memória</h1>

@@ -1,4 +1,5 @@
 import React, { useState, useEffect, useRef, useMemo } from 'react';
+import { Link } from 'react-router-dom';
 import Settings from './Settings';
 import './JogoDoAcerteOuSaia.css';
 import beLogo from '../assets/logo.png'; // Caminho corrigido
@@ -172,6 +173,7 @@ const JogoDoAcerteOuSaia = () => {
     if (phrases.length === 0) {
         return (
             <div className="game-container">
+                <Link to="/" className="home-button"></Link>
                 <p>Nenhuma frase disponível. Por favor, configure as frases.</p>
                 <button className="settings-button" onClick={() => setShowSettings(true)}></button>
                 {showSettings && (
@@ -188,6 +190,7 @@ const JogoDoAcerteOuSaia = () => {
     if (gameEnded) {
         return (
             <div className="game-container end-game-container">
+                <Link to="/" className="home-button"></Link>
                 <h2 className="end-game-message">Parabéns, você chegou ao fim das frases!</h2>
                 <button className="next-phrase-button" onClick={handleRestartGame}>Reiniciar</button>
                 <button className="settings-button" onClick={() => setShowSettings(true)}></button>
@@ -204,6 +207,7 @@ const JogoDoAcerteOuSaia = () => {
 
     return (
         <div className="game-container">
+            <Link to="/" className="home-button"></Link>
             <button className="settings-button" onClick={() => setShowSettings(true)}></button>
             <img src={beLogo} alt="Be Eventos Logo" className="be-logo" />
 

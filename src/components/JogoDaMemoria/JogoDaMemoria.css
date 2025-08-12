@@ -18,9 +18,30 @@ body {
     border-radius: 10px;
     box-shadow: 0 5px 15px rgba(0, 0, 0, 0.2);
     width: 90%;
+    /* AUMENTADO: Aumentando a largura máxima para o layout 6x6 */
     max-width: 800px;
     margin: 40px auto;
     position: relative;
+}
+
+.home-button {
+    position: absolute;
+    top: 15px;
+    left: 15px;
+    background-color: transparent;
+    border: none;
+    cursor: pointer;
+    width: 30px;
+    height: 30px;
+    background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24' fill='none' stroke='%23666' stroke-width='2' stroke-linecap='round' stroke-linejoin='round'%3E%3Cpath d='M3 9l9-7 9 7v11a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2z'%3E%3C/path%3E%3Cpolyline points='9 22 9 12 15 12 15 22'%3E%3C/polyline%3E%3C/svg%3E");
+    background-size: contain;
+    background-repeat: no-repeat;
+    background-position: center;
+    transition: transform 0.3s ease;
+}
+
+.home-button:hover {
+    transform: scale(1.1);
 }
 
 .settings-button {
@@ -57,7 +78,7 @@ body {
     padding: 10px;
 }
 
-
+/* Ajuste para grids maiores */
 @media (min-width: 768px) {
     .memory-grid {
         /* Centralizando o grid em telas maiores */
@@ -149,7 +170,7 @@ body {
     font-weight: 900;
 }
 
-/* Modal de configurações */
+/* Modal de configurações (sem alterações) */
 .settings-overlay {
     position: fixed;
     top: 0;

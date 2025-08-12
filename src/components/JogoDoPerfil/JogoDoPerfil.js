@@ -1,8 +1,9 @@
 import React, { useState, useEffect, useMemo } from 'react';
+import { Link } from 'react-router-dom';
 import Settings from './Settings';
 import './JogoDoPerfil.css';
 import './Settings.css';
-import beLogo from '../assets/logo.png'; 
+import beLogo from '../assets/logo.png'; // Caminho corrigido
 
 const DEFAULT_PROFILES = [
     {
@@ -119,6 +120,7 @@ const JogoDoPerfil = () => {
     if (profiles.length === 0) {
         return (
             <div className="game-container">
+                <Link to="/" className="home-button"></Link>
                 <p>Nenhum perfil disponível. Por favor, configure os perfis.</p>
                 <button className="settings-button" onClick={() => setShowSettings(true)}></button>
                 {showSettings && (
@@ -135,6 +137,7 @@ const JogoDoPerfil = () => {
     if (gameEnded) {
         return (
             <div className="game-container end-game-container">
+                <Link to="/" className="home-button"></Link>
                 <h2 className="end-game-message">Parabéns, você chegou ao fim dos perfis!</h2>
                 <button className="next-profile-button" onClick={handleRestartGame}>Reiniciar</button>
                 <button className="settings-button" onClick={() => setShowSettings(true)}></button>
@@ -151,6 +154,7 @@ const JogoDoPerfil = () => {
 
     return (
         <div className="game-container">
+            <Link to="/" className="home-button"></Link>
             <button className="settings-button" onClick={() => setShowSettings(true)}></button>
             <img src={beLogo} alt="Be Eventos Logo" className="be-logo" />
 
