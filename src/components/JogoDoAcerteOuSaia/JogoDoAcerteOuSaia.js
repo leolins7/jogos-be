@@ -74,6 +74,7 @@ const JogoDoAcerteOuSaia = () => {
 
     const endGame = (msg, type) => {
         setGameActive(false);
+        setShowFullWord(true);
         setMessage(msg);
         setMessageType(type);
     };
@@ -154,11 +155,6 @@ const JogoDoAcerteOuSaia = () => {
             }
         }
 
-        for (let i = availableIndices.length - 1; i > 0; i--) {
-            const j = Math.floor(Math.random() * (i + 1));
-            [availableIndices[i], availableIndices[j]] = [availableIndices[j], availableIndices[i]];
-        }
-
         for (let i = 0; i < additionalCharsToReveal && i < availableIndices.length; i++) {
             const indexToReveal = availableIndices[i];
             hintChars[indexToReveal] = word[indexToReveal];
@@ -169,6 +165,9 @@ const JogoDoAcerteOuSaia = () => {
 
     const currentPhrase = phrases[currentPhraseIndex];
     const isLastPhrase = currentPhraseIndex === phrases.length - 1;
+    
+    // Condição para renderizar o botão de Iniciar apenas no estado inicial
+    const isInitialState = !gameActive && !gameEnded && currentPhraseIndex === 0 && timer === INITIAL_TIME;
 
     if (phrases.length === 0) {
         return (
@@ -213,11 +212,11 @@ const JogoDoAcerteOuSaia = () => {
 
             <h1 className="game-title">Acerte ou Saia</h1>
             
-            {!gameActive && !gameEnded && (
+            {isInitialState && (
                  <button className="start-button" onClick={startGame}>Iniciar Jogo</button>
             )}
 
-            {gameActive && (
+            {!isInitialState && !gameEnded && (
                 <>
                     <div id="timer">Tempo: <span>{formatTime(timer)}</span></div>
                     
@@ -226,16 +225,21 @@ const JogoDoAcerteOuSaia = () => {
 
                     <div className="game-controls">
                         {!showFullWord && (
-                            <button className="reveal-full-word-button" onClick={() => setShowFullWord(true)}>
+                            <button className="reveal-full-word-button" onClick={() => {
+                                setShowFullWord(true);
+                                setGameActive(false);
+                            }}>
                                 Revelar Resposta
                             </button>
                         )}
-                        <button
-                            className="next-phrase-button"
-                            onClick={goToNextPhrase}
-                        >
-                            {isLastPhrase ? 'Fim' : 'Próxima Frase'}
-                        </button>
+                        {showFullWord && (
+                            <button
+                                className="next-phrase-button"
+                                onClick={goToNextPhrase}
+                            >
+                                {isLastPhrase ? 'Fim' : 'Próxima Frase'}
+                            </button>
+                        )}
                     </div>
                 </>
             )}
