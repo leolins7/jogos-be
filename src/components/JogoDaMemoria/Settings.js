@@ -1,6 +1,4 @@
 import React, { useState, useEffect } from 'react';
-// Removido o import de Settings.css para consolidar os estilos
-// no arquivo principal JogoDaMemoria.css
 
 const Settings = ({ onSave, initialCardContent, initialGridSize, onClose }) => {
     const [cardPairs, setCardPairs] = useState([]);

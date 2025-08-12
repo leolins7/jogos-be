@@ -18,7 +18,6 @@ body {
     border-radius: 10px;
     box-shadow: 0 5px 15px rgba(0, 0, 0, 0.2);
     width: 90%;
-    /* AUMENTADO: Aumentando a largura máxima para o layout 6x6 */
     max-width: 800px;
     margin: 40px auto;
     position: relative;
@@ -58,7 +57,7 @@ body {
     padding: 10px;
 }
 
-/* Ajuste para grids maiores */
+
 @media (min-width: 768px) {
     .memory-grid {
         /* Centralizando o grid em telas maiores */
@@ -150,7 +149,7 @@ body {
     font-weight: 900;
 }
 
-/* Modal de configurações (sem alterações) */
+/* Modal de configurações */
 .settings-overlay {
     position: fixed;
     top: 0;

@@ -63,7 +63,7 @@ const JogoDaMemoria = () => {
     useEffect(() => {
         if (matchedCards.length > 0 && matchedCards.length === cardContent.length / 2) {
             setGameActive(false);
-            // Removido o alertbox
+           
         }
     }, [matchedCards, cardContent]);
     

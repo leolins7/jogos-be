@@ -1,6 +1,6 @@
 import React from 'react';
 import { Link } from 'react-router-dom';
-import beLogo from '../assets/logo.png'; // Caminho corrigido
+import beLogo from '../assets/logo.png'; 
 import './GameHub.css';
 
 const GameHub = () => {

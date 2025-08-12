@@ -2,7 +2,7 @@ import React, { useState, useEffect, useMemo } from 'react';
 import Settings from './Settings';
 import './JogoDoPerfil.css';
 import './Settings.css';
-import beLogo from '../assets/logo.png'; // Caminho corrigido
+import beLogo from '../assets/logo.png'; 
 
 const DEFAULT_PROFILES = [
     {

@@ -38,7 +38,7 @@
 }
 
 .phrase-input-group input {
-    flex: 1; /* Faz os inputs ocuparem o espaço disponível */
+    flex: 1; 
     padding: 10px;
     border: 1px solid #ccc;
     border-radius: 5px;
