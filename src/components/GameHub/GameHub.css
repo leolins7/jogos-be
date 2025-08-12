@@ -1,0 +1,55 @@
+.game-hub-container {
+    padding: 40px;
+    background-color: #ffffff;
+    border-radius: 10px;
+    box-shadow: 0 5px 15px rgba(0, 0, 0, 0.2);
+    width: 90%;
+    max-width: 600px;
+    margin: 40px auto;
+    text-align: center;
+}
+
+.hub-logo {
+    max-width: 250px;
+    margin-bottom: 20px;
+}
+
+.hub-title {
+    font-size: 2.5em;
+    color: var(--be-eventos-blue);
+    margin-bottom: 10px;
+}
+
+.hub-subtitle {
+    font-size: 1.2em;
+    color: var(--be-eventos-text);
+    margin-bottom: 30px;
+}
+
+.games-list {
+    display: flex;
+    flex-direction: column;
+    gap: 20px;
+}
+
+.game-card {
+    text-decoration: none;
+    background-color: #f0f0f0;
+    color: var(--be-eventos-blue);
+    font-weight: bold;
+    font-size: 1.5em;
+    padding: 20px;
+    border-radius: 10px;
+    transition: background-color 0.3s ease, transform 0.2s ease;
+}
+
+.game-card:hover {
+    background-color: #e0e0e0;
+    transform: translateY(-5px);
+}
+
+.game-card.coming-soon {
+    background-color: #f8f8f8;
+    color: #999;
+    cursor: not-allowed;
+}

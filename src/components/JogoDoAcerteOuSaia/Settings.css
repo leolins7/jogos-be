@@ -1,0 +1,141 @@
+.settings-overlay {
+    position: fixed;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    background-color: rgba(0, 0, 0, 0.6);
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    z-index: 1000;
+}
+
+.settings-modal {
+    background-color: #fff;
+    padding: 30px;
+    border-radius: 10px;
+    box-shadow: 0 8px 16px rgba(0, 0, 0, 0.2);
+    width: 90%;
+    max-width: 700px;
+    max-height: 80vh; /* Limita a altura do modal */
+    overflow-y: auto; /* Adiciona scroll se o conteúdo for muito grande */
+    text-align: center;
+}
+
+.settings-modal h2 {
+    color: #333;
+    margin-bottom: 25px;
+    font-size: 1.8em;
+}
+
+.phrase-input-group {
+    display: flex;
+    gap: 10px;
+    margin-bottom: 20px;
+    justify-content: center;
+    flex-wrap: wrap; /* Permite que os inputs quebrem linha em telas menores */
+}
+
+.phrase-input-group input {
+    flex: 1; /* Faz os inputs ocuparem o espaço disponível */
+    padding: 10px;
+    border: 1px solid #ccc;
+    border-radius: 5px;
+    font-size: 1em;
+    min-width: 150px; /* Garante um tamanho mínimo */
+}
+
+.phrase-input-group button {
+    background-color: #28a745;
+    color: white;
+    padding: 10px 20px;
+    border: none;
+    border-radius: 5px;
+    cursor: pointer;
+    font-size: 1em;
+    transition: background-color 0.3s ease;
+}
+
+.phrase-input-group button:hover {
+    background-color: #218838;
+}
+
+.phrases-list ul {
+    list-style: none;
+    padding: 0;
+    max-height: 300px; /* Altura máxima da lista */
+    overflow-y: auto; /* Scroll para a lista */
+    border: 1px solid #eee;
+    border-radius: 5px;
+    margin-bottom: 20px;
+    text-align: left; /* Alinha o texto das frases à esquerda */
+}
+
+.phrases-list li {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    padding: 10px 15px;
+    border-bottom: 1px solid #eee;
+}
+
+.phrases-list li:last-child {
+    border-bottom: none;
+}
+
+.phrases-list li span {
+    flex-grow: 1;
+    margin-right: 15px;
+    color: #555;
+    font-size: 0.95em;
+}
+
+.phrases-list li button {
+    background-color: #dc3545;
+    color: white;
+    padding: 6px 12px;
+    border: none;
+    border-radius: 4px;
+    cursor: pointer;
+    font-size: 0.85em;
+    transition: background-color 0.3s ease;
+}
+
+.phrases-list li button:hover {
+    background-color: #c82333;
+}
+
+.settings-actions {
+    margin-top: 20px;
+    display: flex;
+    justify-content: center;
+    gap: 15px;
+}
+
+.settings-actions button {
+    padding: 12px 25px;
+    border: none;
+    border-radius: 5px;
+    cursor: pointer;
+    font-size: 1.1em;
+    transition: background-color 0.3s ease;
+}
+
+.settings-actions .save-button {
+    background-color: #007bff;
+    color: white;
+}
+
+.settings-actions .save-button:hover {
+    background-color: #0056b3;
+}
+
+.settings-actions .cancel-button {
+    background-color: #6c757d;
+    color: white;
+}
+
+.settings-actions .cancel-button:hover {
+    background-color: #5a6268;
+}

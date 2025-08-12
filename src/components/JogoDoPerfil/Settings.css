@@ -1,0 +1,191 @@
+/* src/components/JogoDoPerfil/Settings.css */
+
+.settings-overlay {
+    position: fixed;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    background-color: rgba(0, 0, 0, 0.7);
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    z-index: 1000;
+}
+
+.settings-modal {
+    background-color: #fff;
+    padding: 30px;
+    border-radius: 10px;
+    box-shadow: 0 8px 16px rgba(0, 0, 0, 0.2);
+    width: 90%;
+    max-width: 700px;
+    max-height: 90vh;
+    overflow-y: auto;
+    text-align: center;
+}
+
+.settings-modal h2 {
+    color: #333;
+    margin-bottom: 25px;
+    font-size: 2em;
+}
+
+.profile-add-form input {
+    width: 100%;
+    padding: 10px;
+    margin-bottom: 10px;
+    border: 1px solid #ccc;
+    border-radius: 5px;
+    font-size: 1em;
+}
+
+.clue-input-group {
+    display: flex;
+    gap: 10px;
+    margin-bottom: 10px;
+}
+
+.clue-input-group input {
+    flex-grow: 1;
+    margin-bottom: 0;
+}
+
+.clue-input-group button {
+    background-color: #28a745;
+    color: white;
+    padding: 10px 15px;
+    border: none;
+    border-radius: 5px;
+    cursor: pointer;
+}
+
+.new-clues-list {
+    list-style: none;
+    padding: 0;
+    margin-bottom: 15px;
+    text-align: left;
+    color: #333;
+}
+
+.new-clues-list li {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    padding: 5px 0;
+    border-bottom: 1px solid #eee;
+}
+
+.new-clues-list li .clue-actions button {
+    padding: 3px 8px;
+    background: none;
+    border: none;
+    cursor: pointer;
+}
+
+.new-clues-list li .clue-actions svg {
+    color: #6c757d;
+    transition: color 0.2s ease;
+}
+
+.new-clues-list li .clue-actions .icon-edit:hover {
+    color: #007bff;
+}
+
+.new-clues-list li .clue-actions .icon-remove:hover {
+    color: #dc3545;
+}
+
+.add-profile-button {
+    background-color: #007bff;
+    color: white;
+    padding: 12px 25px;
+    border: none;
+    border-radius: 5px;
+    cursor: pointer;
+    font-size: 1.1em;
+    margin-bottom: 25px;
+    width: 100%;
+}
+
+.profiles-list {
+    text-align: left;
+}
+
+.profiles-list h3 {
+    margin-bottom: 10px;
+    color: #333;
+}
+
+.profiles-list ul {
+    list-style: none;
+    padding: 0;
+    max-height: 200px;
+    overflow-y: auto;
+    border: 1px solid #eee;
+    border-radius: 5px;
+    margin-bottom: 20px;
+}
+
+.profiles-list li {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    padding: 10px 15px;
+    border-bottom: 1px solid #eee;
+    color: #333;
+}
+
+.profiles-list li:last-child {
+    border-bottom: none;
+}
+
+.profile-actions {
+    display: flex;
+    gap: 5px;
+}
+
+.profile-actions button {
+    background: none;
+    border: none;
+    cursor: pointer;
+    padding: 5px;
+}
+
+.profile-actions svg {
+    color: #6c757d;
+    transition: color 0.2s ease;
+}
+
+.profile-actions .icon-edit:hover {
+    color: #007bff;
+}
+
+.profile-actions .icon-remove:hover {
+    color: #dc3545;
+}
+
+.settings-actions {
+    margin-top: 20px;
+    display: flex;
+    justify-content: center;
+    gap: 15px;
+}
+
+.settings-actions button {
+    padding: 12px 25px;
+    border: none;
+    border-radius: 5px;
+    cursor: pointer;
+    font-size: 1.1em;
+}
+
+.settings-actions .save-button {
+    background-color: #007bff;
+    color: white;
+}
+
+.settings-actions .cancel-button {
+    background-color: #6c757d;
+    color: white;
+}
