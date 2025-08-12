@@ -48,7 +48,7 @@ const JogoDoAcerteOuSaia = () => {
             clearInterval(timerIntervalRef.current);
         }
         return () => clearInterval(timerIntervalRef.current);
-    }, [gameActive]);
+    }, [gameActive, currentPhraseIndex]);
 
     const formatTime = (totalSeconds) => {
         const minutes = Math.floor(totalSeconds / 60);
@@ -82,10 +82,12 @@ const JogoDoAcerteOuSaia = () => {
         if (nextIndex < phrases.length) {
             setCurrentPhraseIndex(nextIndex);
             setTimer(INITIAL_TIME);
+            setGameActive(true);
             setMessage('');
             setMessageType('');
             setShowFullWord(false);
         } else {
+            setGameActive(false);
             setGameEnded(true);
         }
     };
@@ -109,15 +111,15 @@ const JogoDoAcerteOuSaia = () => {
     };
 
     const currentWordHint = useMemo(() => {
-        if (!gameActive || !phrases[currentPhraseIndex]) return '';
+        if (!phrases[currentPhraseIndex]) return '';
 
         const word = phrases[currentPhraseIndex].word;
         if (showFullWord) {
-            return word;
+            return word; // Retorna a palavra sem espaçamento
         }
 
         const wordLength = word.length;
-        let hintChars = Array(wordLength).fill('_');
+        const hintChars = Array(wordLength).fill('_');
 
         for (let i = 0; i < wordLength; i++) {
             if (word[i] === ' ') {
@@ -136,39 +138,33 @@ const JogoDoAcerteOuSaia = () => {
         }
 
         let additionalCharsToReveal = 0;
-        if (wordLength <= 5) {
-            additionalCharsToReveal = 0;
-        } else if (wordLength <= 8) {
+        if (wordLength > 5 && wordLength <= 8) {
+            additionalCharsToReveal = 1;
+        } else if (wordLength > 8 && wordLength <= 12) {
             additionalCharsToReveal = 2;
-        } else if (wordLength <= 12) {
-            additionalCharsToReveal = 3;
-        } else {
-            additionalCharsToReveal = Math.floor(wordLength / 3);
-        }
-
-        let charsAdded = 0;
-        const nonSpaceWordLength = word.replace(/\s/g, '').length;
-        const effectiveLengthForStep = Math.max(1, wordLength - revealedIndices.size - (wordLength - nonSpaceWordLength));
-        const step = Math.max(1, Math.floor(effectiveLengthForStep / (additionalCharsToReveal + 1)));
-
-        for (let i = 1; i < wordLength - 1 && charsAdded < additionalCharsToReveal; i += step) {
-            if (!revealedIndices.has(i) && word[i] !== ' ') {
-                hintChars[i] = word[i];
-                revealedIndices.add(i);
-                charsAdded++;
-            }
+        } else if (wordLength > 12) {
+            additionalCharsToReveal = Math.floor(wordLength / 4);
         }
         
-        let finalHint = '';
-        for (let i = 0; i < hintChars.length; i++) {
-            finalHint += hintChars[i];
-            if (i < hintChars.length - 1 && hintChars[i] !== ' ' && hintChars[i + 1] !== ' ') {
-                finalHint += ' ';
+        const availableIndices = [];
+        for (let i = 1; i < wordLength - 1; i++) {
+            if (word[i] !== ' ' && !revealedIndices.has(i)) {
+                availableIndices.push(i);
             }
         }
-        return finalHint;
 
-    }, [currentPhraseIndex, gameActive, phrases, showFullWord]);
+        for (let i = availableIndices.length - 1; i > 0; i--) {
+            const j = Math.floor(Math.random() * (i + 1));
+            [availableIndices[i], availableIndices[j]] = [availableIndices[j], availableIndices[i]];
+        }
+
+        for (let i = 0; i < additionalCharsToReveal && i < availableIndices.length; i++) {
+            const indexToReveal = availableIndices[i];
+            hintChars[indexToReveal] = word[indexToReveal];
+        }
+
+        return hintChars.join(' ');
+    }, [currentPhraseIndex, phrases, showFullWord]);
 
     const currentPhrase = phrases[currentPhraseIndex];
     const isLastPhrase = currentPhraseIndex === phrases.length - 1;
@@ -188,7 +184,7 @@ const JogoDoAcerteOuSaia = () => {
             </div>
         );
     }
-
+    
     if (gameEnded) {
         return (
             <div className="game-container end-game-container">
@@ -213,25 +209,32 @@ const JogoDoAcerteOuSaia = () => {
 
             <h1 className="game-title">Acerte ou Saia</h1>
             
-            <div id="timer">Tempo: <span>{formatTime(timer)}</span></div>
-            
-            <p id="phrase-display">{currentPhrase ? currentPhrase.phrase : 'Carregando frase...'}</p>
-            <div className="word-hint-display">{currentWordHint}</div>
+            {!gameActive && !gameEnded && (
+                 <button className="start-button" onClick={startGame}>Iniciar Jogo</button>
+            )}
 
-            <div className="game-controls">
-                {!showFullWord && (
-                    <button className="reveal-full-word-button" onClick={() => setShowFullWord(true)}>
-                        Revelar Resposta
-                    </button>
-                )}
-                <button
-                    className="next-phrase-button"
-                    onClick={goToNextPhrase}
-                    disabled={isLastPhrase && !showFullWord}
-                >
-                    {isLastPhrase ? 'Fim' : 'Próxima Frase'}
-                </button>
-            </div>
+            {gameActive && (
+                <>
+                    <div id="timer">Tempo: <span>{formatTime(timer)}</span></div>
+                    
+                    <p id="phrase-display">{currentPhrase ? currentPhrase.phrase : 'Carregando frase...'}</p>
+                    <div className={`word-hint-display ${showFullWord ? 'revealed' : ''}`}>{currentWordHint}</div>
+
+                    <div className="game-controls">
+                        {!showFullWord && (
+                            <button className="reveal-full-word-button" onClick={() => setShowFullWord(true)}>
+                                Revelar Resposta
+                            </button>
+                        )}
+                        <button
+                            className="next-phrase-button"
+                            onClick={goToNextPhrase}
+                        >
+                            {isLastPhrase ? 'Fim' : 'Próxima Frase'}
+                        </button>
+                    </div>
+                </>
+            )}
 
             {showSettings && (
                 <Settings

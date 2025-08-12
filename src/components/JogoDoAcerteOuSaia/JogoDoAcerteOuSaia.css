@@ -60,13 +60,6 @@ body {
     transform: rotate(90deg);
 }
 
-.be-logo {
-    max-width: 250px;
-    height: auto;
-    margin: 0 auto 30px auto;
-    display: block;
-}
-
 .game-title {
     font-size: 2.5em;
     color: var(--be-eventos-blue);
@@ -88,10 +81,6 @@ body {
     justify-content: center;
     align-items: center;
     margin: 0 auto;
-}
-
-#timer span {
-    color: var(--be-eventos-yellow);
 }
 
 #phrase-display {
@@ -126,6 +115,13 @@ body {
     border-radius: 10px;
     box-shadow: 0 4px 15px rgba(0, 0, 0, 0.15);
     text-transform: uppercase;
+}
+
+.word-hint-display.revealed {
+    letter-spacing: normal;
+    font-size: 2em;
+    word-break: break-word;
+    line-height: 1.2;
 }
 
 .game-controls {
@@ -287,4 +283,24 @@ body {
 .settings-actions .cancel-button {
     background-color: #6c757d;
     color: white;
+}
+/* Estilo para o botão de Iniciar Jogo */
+.start-button {
+    background-color: var(--be-eventos-green);
+    color: white;
+    padding: 15px 40px;
+    font-size: 1.5em;
+    font-weight: bold;
+    border: none;
+    border-radius: 10px;
+    margin: 40px 0;
+    cursor: pointer;
+    transition: background-color 0.3s ease, transform 0.2s ease, box-shadow 0.3s ease;
+    box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+}
+
+.start-button:hover {
+    background-color: #218838; /* Tom de verde mais escuro */
+    transform: translateY(-3px);
+    box-shadow: 0 6px 12px rgba(0, 0, 0, 0.2);
 }
