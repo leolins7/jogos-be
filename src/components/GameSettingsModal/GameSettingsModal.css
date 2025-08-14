@@ -1,0 +1,92 @@
+/* src/components/GameSettingsModal/GameSettingsModal.css */
+.settings-overlay {
+    position: fixed;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    background-color: rgba(0, 0, 0, 0.7);
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    z-index: 1000;
+}
+
+.settings-modal {
+    background-color: #fff;
+    padding: 30px;
+    border-radius: 10px;
+    box-shadow: 0 8px 16px rgba(0, 0, 0, 0.2);
+    width: 90%;
+    max-width: 500px;
+    text-align: center;
+}
+
+.settings-modal h2 {
+    color: var(--be-eventos-blue);
+    margin-bottom: 25px;
+    font-size: 2em;
+}
+
+.game-selection {
+    margin-bottom: 30px;
+}
+
+.game-selection h3 {
+    margin: 0 0 10px 0;
+    color: var(--be-eventos-text);
+}
+
+.game-selection select {
+    width: 100%;
+    padding: 10px 15px;
+    border: 1px solid #ccc;
+    border-radius: 5px;
+    font-size: 1em;
+    cursor: pointer;
+    background-color: #f8f8f8;
+    appearance: none;
+    background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24'%3E%3Cpath fill='%23666' d='M7 10l5 5 5-5z'/%3E%3C/svg%3E");
+    background-repeat: no-repeat;
+    background-position: right 10px center;
+    background-size: 20px;
+}
+
+.game-selection select:focus {
+    outline: none;
+    border-color: var(--be-eventos-blue);
+}
+
+.modal-actions {
+    display: flex;
+    justify-content: center;
+    gap: 15px;
+}
+
+.save-button-modal, .cancel-button-modal {
+    padding: 12px 25px;
+    border: none;
+    border-radius: 5px;
+    cursor: pointer;
+    font-size: 1.1em;
+    font-weight: bold;
+    transition: background-color 0.3s ease;
+}
+
+.save-button-modal {
+    background-color: var(--be-eventos-green);
+    color: white;
+}
+
+.save-button-modal:hover {
+    background-color: #218838;
+}
+
+.cancel-button-modal {
+    background-color: #6c757d;
+    color: white;
+}
+
+.cancel-button-modal:hover {
+    background-color: #5a6268;
+}

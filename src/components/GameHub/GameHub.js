@@ -1,11 +1,12 @@
 import React from 'react';
 import { Link } from 'react-router-dom';
-import beLogo from '../assets/logo.png'; 
+import beLogo from '../assets/logo.png'; // Caminho corrigido
 import './GameHub.css';
 
 const GameHub = () => {
   return (
     <div className="game-hub-container">
+      <Link to="/" className="home-button-gameshub"></Link>
       <img src={beLogo} alt="Be Eventos Logo" className="hub-logo" />
       <h1 className="hub-title">Central de Jogos</h1>
       <p className="hub-subtitle">Selecione um jogo para começar:</p>
