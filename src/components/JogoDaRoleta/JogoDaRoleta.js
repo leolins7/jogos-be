@@ -17,74 +17,127 @@ const JogoDaRoleta = () => {
     const [items, setItems] = useState([]);
     const [showSettings, setShowSettings] = useState(false);
     const [rotation, setRotation] = useState(0);
-    const rouletteWheelRef = useRef(null);
+    const canvasRef = useRef(null);
+
+    const colors = ["#2d559a", "#f1b302", "#dc3545", "#28a745"];
+    const degreesPerItem = 360 / items.length;
 
     useEffect(() => {
         try {
             const savedItems = localStorage.getItem('rouletteItems');
             const parsedItems = savedItems ? JSON.parse(savedItems) : DEFAULT_ITEMS;
-            setItems(parsedItems);
+            setItems(parsedItems.slice(0, 11)); // Garante no máximo 11 itens
         } catch (e) {
             console.error("Failed to parse roulette items from localStorage", e);
             setItems(DEFAULT_ITEMS);
         }
     }, []);
 
+    useEffect(() => {
+        const canvas = canvasRef.current;
+        const ctx = canvas.getContext('2d');
+        const centerX = canvas.width / 2;
+        const centerY = canvas.height / 2;
+        const radius = Math.min(centerX, centerY) * 0.9;
+
+        // Limpa o canvas antes de redesenhar
+        ctx.clearRect(0, 0, canvas.width, canvas.height);
+
+        // Salva o estado atual do canvas e aplica a rotação
+        ctx.save();
+        ctx.translate(centerX, centerY);
+        ctx.rotate(rotation * Math.PI / 180);
+        ctx.translate(-centerX, -centerY);
+
+        // Desenha os segmentos
+        for (let i = 0; i < items.length; i++) {
+            const startAngle = (i * degreesPerItem) * Math.PI / 180;
+            const endAngle = ((i + 1) * degreesPerItem) * Math.PI / 180;
+
+            ctx.beginPath();
+            ctx.moveTo(centerX, centerY);
+            ctx.arc(centerX, centerY, radius, startAngle, endAngle);
+            ctx.closePath();
+            ctx.fillStyle = colors[i % colors.length];
+            ctx.fill();
+
+            // Desenha as bordas
+            ctx.strokeStyle = '#ccc';
+            ctx.lineWidth = 1;
+            ctx.stroke();
+
+            // Desenha o texto
+            ctx.save();
+            ctx.translate(centerX, centerY);
+            ctx.rotate(startAngle + (degreesPerItem / 2) * Math.PI / 180);
+            ctx.textAlign = 'right';
+            ctx.fillStyle = 'white';
+            ctx.font = 'bold 16px Arial';
+            ctx.fillText(items[i].text, radius * 0.9, 5);
+            ctx.restore();
+        }
+
+        // Restaura o estado original do canvas
+        ctx.restore();
+
+        // Desenha o círculo central
+        ctx.beginPath();
+        ctx.arc(centerX, centerY, radius * 0.25, 0, 2 * Math.PI);
+        ctx.fillStyle = 'white';
+        ctx.fill();
+
+        // Desenha a logo no centro
+        const img = new Image();
+        img.src = beLogo;
+        img.onload = () => {
+            const logoSize = radius * 0.4;
+            ctx.drawImage(img, centerX - logoSize / 2, centerY - logoSize / 2, logoSize, logoSize);
+        };
+        
+        const logoSize = radius * 0.4;
+        ctx.drawImage(img, centerX - logoSize / 2, centerY - logoSize / 2, logoSize, logoSize);
+        
+    }, [items, rotation]);
+
     const spin = () => {
         if (isSpinning || items.length === 0) return;
+        setIsSpinning(true);
+        setResult(null);
 
         const totalSpins = 5;
         const randomAngle = Math.random() * 360;
         const newRotation = rotation + (360 * totalSpins) + randomAngle;
+        
+        let start = Date.now();
+        let duration = 5000;
 
-        const degreesPerItem = 360 / items.length;
+        function animate() {
+            let elapsed = Date.now() - start;
+            let progress = Math.min(elapsed / duration, 1);
+            let easedProgress = 1 - Math.pow(1 - progress, 3);
+            let currentRotation = rotation + (newRotation - rotation) * easedProgress;
+            setRotation(currentRotation);
 
-        // Ponteiro no topo (12h = 270°) e 0° do conic-gradient na direita
-        const finalAngle = (360 - (newRotation % 360) + 270) % 360;
-        const winningIndex = Math.floor(finalAngle / degreesPerItem);
-
-        // snapshot para não mudar se o usuário editar itens durante o giro
-        const chosenText = items[winningIndex].text;
-
-        setIsSpinning(true);
-        setResult(null);
-        setRotation(newRotation);
-
-        setTimeout(() => {
-            setIsSpinning(false);
-            setResult(chosenText);
-        }, 5000);
+            if (progress < 1) {
+                requestAnimationFrame(animate);
+            } else {
+                setIsSpinning(false);
+                const finalAngle = (360 - (newRotation % 360) + 270) % 360;
+                const winningIndex = Math.floor(finalAngle / degreesPerItem);
+                setResult(items[winningIndex].text);
+            }
+        }
+        
+        requestAnimationFrame(animate);
     };
 
     const handleSaveItems = (updatedItems) => {
         setItems(updatedItems);
         localStorage.setItem('rouletteItems', JSON.stringify(updatedItems));
         setShowSettings(false);
-
-        if (rouletteWheelRef.current) {
-            rouletteWheelRef.current.style.transition = 'none';
-            setRotation(0);
-            setTimeout(() => {
-                if (rouletteWheelRef.current) {
-                    rouletteWheelRef.current.style.transition = 'transform 5s cubic-bezier(0.25, 0.1, 0.25, 1)';
-                }
-            }, 50);
-        }
+        setRotation(0);
         setResult(null);
     };
-
-    const generateConicGradient = () => {
-        if (items.length === 0) return 'transparent';
-        const degreePerItem = 360 / items.length;
-        const colors = ["var(--be-eventos-blue)", "var(--be-eventos-yellow)", "var(--be-eventos-red)", "var(--be-eventos-green)"];
-        const gradientColors = items.map((_, index) => {
-            const color = colors[index % colors.length];
-            return `${color} ${index * degreePerItem}deg ${(index + 1) * degreePerItem}deg`;
-        });
-        return `conic-gradient(${gradientColors.join(', ')})`;
-    };
-
-    const degreesPerItem = 360 / items.length;
 
     return (
         <div className="game-container">
@@ -95,36 +148,8 @@ const JogoDaRoleta = () => {
             <h1 className="game-title">Jogo da Roleta</h1>
 
             <div className="roulette-wrapper">
+                <canvas ref={canvasRef} width="500" height="500"></canvas>
                 <div className="roulette-pointer"></div>
-                
-                <div
-                    ref={rouletteWheelRef}
-                    className="roulette-spinner"
-                    style={{ transform: `rotate(${rotation}deg)` }}
-                >
-                    <div className="roulette-wheel" style={{ background: generateConicGradient() }}>
-                        <ul className="roulette-labels">
-                            {items.map((item, index) => {
-                                const angle = index * degreesPerItem + degreesPerItem / 2;
-                                return (
-                                    <li
-                                        key={index}
-                                        className="roulette-label"
-                                        style={{ transform: `rotate(${angle}deg)` }}
-                                    >
-                                        <span className="item-text" style={{ transform: `rotate(-${angle}deg)` }}>
-                                            {item.text}
-                                        </span>
-                                    </li>
-                                );
-                            })}
-                        </ul>
-                    </div>
-                </div>
-
-                <div className="roulette-center">
-                    <img src={beLogo} alt="Be Eventos Logo" className="center-logo" />
-                </div>
             </div>
 
             <div className="game-controls">
