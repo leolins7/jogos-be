@@ -1,113 +1,90 @@
-import React, { useState, useMemo, useRef, useEffect } from 'react';
+import React, { useState, useRef, useEffect } from 'react';
 import { Link } from 'react-router-dom';
 import beLogo from '../assets/logo.png';
 import Settings from './Settings';
 import './JogoDaRoleta.css';
 
 const DEFAULT_ITEMS = [
-    { text: "Item 1", color: "var(--be-eventos-blue)" },
-    { text: "Item 2", color: "var(--be-eventos-yellow)" },
-    { text: "Item 3", color: "var(--be-eventos-red)" },
-    { text: "Item 4", color: "var(--be-eventos-green)" },
-    { text: "Item 5", color: "var(--be-eventos-blue)" },
-    { text: "Item 6", color: "var(--be-eventos-yellow)" },
-    { text: "Item 7", color: "var(--be-eventos-red)" },
-    { text: "Item 8", color: "var(--be-eventos-green)" },
-    { text: "Item 9", color: "var(--be-eventos-blue)" },
-    { text: "Item 10", color: "var(--be-eventos-yellow)" },
-    { text: "Item 11", color: "var(--be-eventos-red)" }
+    { text: "Item 1" }, { text: "Item 2" }, { text: "Item 3" },
+    { text: "Item 4" }, { text: "Item 5" }, { text: "Item 6" },
+    { text: "Item 7" }, { text: "Item 8" }, { text: "Item 9" },
+    { text: "Item 10" }, { text: "Item 11" }
 ];
 
 const JogoDaRoleta = () => {
     const [isSpinning, setIsSpinning] = useState(false);
     const [result, setResult] = useState(null);
-    const [items, setItems] = useState(() => {
-        const savedItems = localStorage.getItem('rouletteItems');
+    const [items, setItems] = useState([]);
+    const [showSettings, setShowSettings] = useState(false);
+    const [rotation, setRotation] = useState(0);
+    const rouletteWheelRef = useRef(null);
+
+    useEffect(() => {
         try {
+            const savedItems = localStorage.getItem('rouletteItems');
             const parsedItems = savedItems ? JSON.parse(savedItems) : DEFAULT_ITEMS;
-            const finalItems = parsedItems.slice(0, 11);
-            while (finalItems.length < 11) {
-                const index = finalItems.length;
-                const color = index % 4 === 0 ? "var(--be-eventos-blue)" : index % 4 === 1 ? "var(--be-eventos-yellow)" : index % 4 === 2 ? "var(--be-eventos-red)" : "var(--be-eventos-green)";
-                finalItems.push({ text: `Item ${index + 1}`, color });
-            }
-            return finalItems;
+            setItems(parsedItems);
         } catch (e) {
             console.error("Failed to parse roulette items from localStorage", e);
-            return DEFAULT_ITEMS;
+            setItems(DEFAULT_ITEMS);
         }
-    });
-    const [showSettings, setShowSettings] = useState(false);
-    const rouletteRef = useRef(null);
-    const degreesPerItem = 360 / items.length;
+    }, []);
 
     const spin = () => {
-        if (isSpinning) return;
+        if (isSpinning || items.length === 0) return;
+
+        const totalSpins = 5;
+        const randomAngle = Math.random() * 360;
+        const newRotation = rotation + (360 * totalSpins) + randomAngle;
+
+        const degreesPerItem = 360 / items.length;
+
+        // Ponteiro no topo (12h = 270°) e 0° do conic-gradient na direita
+        const finalAngle = (360 - (newRotation % 360) + 270) % 360;
+        const winningIndex = Math.floor(finalAngle / degreesPerItem);
+
+        // snapshot para não mudar se o usuário editar itens durante o giro
+        const chosenText = items[winningIndex].text;
+
         setIsSpinning(true);
         setResult(null);
-
-        // Resetar a transição e a rotação antes de iniciar um novo giro
-        rouletteRef.current.style.transition = 'none';
-        rouletteRef.current.style.transform = `rotate(0deg)`;
-
-        // Força o navegador a recalcular o layout antes da nova transição
-        void rouletteRef.current.offsetHeight;
-
-        const randomIndex = Math.floor(Math.random() * items.length);
-        const totalSpins = 5 * 360; // 5 giros completos
-        const finalDegree = totalSpins + (360 - (degreesPerItem * randomIndex) - (degreesPerItem / 2));
-        
-        rouletteRef.current.style.transition = 'transform 5s cubic-bezier(0.25, 0.1, 0.25, 1.0)';
-        rouletteRef.current.style.transform = `rotate(${finalDegree}deg)`;
+        setRotation(newRotation);
 
         setTimeout(() => {
             setIsSpinning(false);
-            setResult(items[randomIndex].text);
-            // Manter a roleta no ângulo final, mas sem a transição
-            rouletteRef.current.style.transition = 'none'; 
-            const finalAngle = finalDegree % 360;
-            rouletteRef.current.style.transform = `rotate(${finalAngle}deg)`;
-        }, 5000); // 5 segundos, o mesmo tempo da transição
+            setResult(chosenText);
+        }, 5000);
     };
 
     const handleSaveItems = (updatedItems) => {
-        const reColoredItems = updatedItems.map((item, i) => ({
-            ...item,
-            color: i % 4 === 0 ? "var(--be-eventos-blue)" : i % 4 === 1 ? "var(--be-eventos-yellow)" : i % 4 === 2 ? "var(--be-eventos-red)" : "var(--be-eventos-green)"
-        }));
-        setItems(reColoredItems);
-        localStorage.setItem('rouletteItems', JSON.stringify(reColoredItems));
+        setItems(updatedItems);
+        localStorage.setItem('rouletteItems', JSON.stringify(updatedItems));
         setShowSettings(false);
+
+        if (rouletteWheelRef.current) {
+            rouletteWheelRef.current.style.transition = 'none';
+            setRotation(0);
+            setTimeout(() => {
+                if (rouletteWheelRef.current) {
+                    rouletteWheelRef.current.style.transition = 'transform 5s cubic-bezier(0.25, 0.1, 0.25, 1)';
+                }
+            }, 50);
+        }
+        setResult(null);
     };
 
-    const segments = useMemo(() => {
-        const degreesPerItem = 360 / items.length;
-        const itemSkew = 90 - degreesPerItem;
-        const textRotate = degreesPerItem / 2;
-
-        return items.map((item, index) => {
-            const rotateDeg = index * degreesPerItem;
-            return (
-                <div 
-                    key={index} 
-                    className="roulette-segment"
-                    style={{
-                        backgroundColor: item.color,
-                        transform: `rotate(${rotateDeg}deg) skewY(${itemSkew}deg)`,
-                    }}
-                >
-                    <div 
-                        className="segment-content"
-                        style={{ 
-                            transform: `skewY(-${itemSkew}deg) rotate(${textRotate}deg)`,
-                        }}
-                    >
-                        <span>{item.text}</span>
-                    </div>
-                </div>
-            );
+    const generateConicGradient = () => {
+        if (items.length === 0) return 'transparent';
+        const degreePerItem = 360 / items.length;
+        const colors = ["var(--be-eventos-blue)", "var(--be-eventos-yellow)", "var(--be-eventos-red)", "var(--be-eventos-green)"];
+        const gradientColors = items.map((_, index) => {
+            const color = colors[index % colors.length];
+            return `${color} ${index * degreePerItem}deg ${(index + 1) * degreePerItem}deg`;
         });
-    }, [items]);
+        return `conic-gradient(${gradientColors.join(', ')})`;
+    };
+
+    const degreesPerItem = 360 / items.length;
 
     return (
         <div className="game-container">
@@ -118,18 +95,41 @@ const JogoDaRoleta = () => {
             <h1 className="game-title">Jogo da Roleta</h1>
 
             <div className="roulette-wrapper">
-                <div className="roulette" ref={rouletteRef}>
-                    {segments}
+                <div className="roulette-pointer"></div>
+                
+                <div
+                    ref={rouletteWheelRef}
+                    className="roulette-spinner"
+                    style={{ transform: `rotate(${rotation}deg)` }}
+                >
+                    <div className="roulette-wheel" style={{ background: generateConicGradient() }}>
+                        <ul className="roulette-labels">
+                            {items.map((item, index) => {
+                                const angle = index * degreesPerItem + degreesPerItem / 2;
+                                return (
+                                    <li
+                                        key={index}
+                                        className="roulette-label"
+                                        style={{ transform: `rotate(${angle}deg)` }}
+                                    >
+                                        <span className="item-text" style={{ transform: `rotate(-${angle}deg)` }}>
+                                            {item.text}
+                                        </span>
+                                    </li>
+                                );
+                            })}
+                        </ul>
+                    </div>
                 </div>
+
                 <div className="roulette-center">
                     <img src={beLogo} alt="Be Eventos Logo" className="center-logo" />
                 </div>
-                <div className="roulette-pointer"></div>
             </div>
 
             <div className="game-controls">
-                <button 
-                    className="spin-button" 
+                <button
+                    className="spin-button"
                     onClick={spin}
                     disabled={isSpinning}
                 >

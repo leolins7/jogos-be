@@ -1,58 +1,72 @@
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import './Settings.css';
 
 const Settings = ({ onSave, initialItems, onClose }) => {
-    const [items, setItems] = useState(initialItems);
-    const [newItem, setNewItem] = useState('');
+    // Garante que o estado inicial seja sempre um array, mesmo que initialItems seja nulo
+    const [items, setItems] = useState(() => initialItems || []);
+    const [newItemText, setNewItemText] = useState('');
     const [editingIndex, setEditingIndex] = useState(null);
 
+    // Sincroniza o estado interno se os itens iniciais mudarem
+    useEffect(() => {
+        setItems(initialItems || []);
+    }, [initialItems]);
+
     const handleAddItem = () => {
-        if (newItem.trim() !== '' && items.length < 11) {
-            const color = items.length % 2 === 0 ? "var(--be-eventos-blue)" : "var(--be-eventos-yellow)";
-            setItems([...items, { text: newItem.trim(), color }]);
-            setNewItem('');
+        if (newItemText.trim() !== '' && items.length < 11) {
+            // Apenas o texto é necessário, a cor é controlada no componente principal
+            setItems([...items, { text: newItemText.trim() }]);
+            setNewItemText('');
         }
     };
 
-    const handleUpdateItem = (index) => {
-        if (newItem.trim() !== '') {
+    const handleUpdateItem = () => {
+        if (newItemText.trim() !== '' && editingIndex !== null) {
             const updatedItems = [...items];
-            updatedItems[index].text = newItem.trim();
+            updatedItems[editingIndex].text = newItemText.trim();
             setItems(updatedItems);
             setEditingIndex(null);
-            setNewItem('');
+            setNewItemText('');
         }
     };
 
-    const handleRemoveItem = (index) => {
-        const updatedItems = items.filter((_, i) => i !== index);
-        const reColoredItems = updatedItems.map((item, i) => ({
-            ...item,
-            color: i % 2 === 0 ? "var(--be-eventos-blue)" : "var(--be-eventos-yellow)"
-        }));
-        setItems(reColoredItems);
+    const handleRemoveItem = (indexToRemove) => {
+        const updatedItems = items.filter((_, index) => index !== indexToRemove);
+        setItems(updatedItems);
     };
 
     const handleEditClick = (index) => {
         setEditingIndex(index);
-        setNewItem(items[index].text);
+        setNewItemText(items[index].text);
+    };
+
+    const handleSaveAndClose = () => {
+        if (items.length === 0) {
+            alert('Adicione pelo menos um item para salvar.');
+            return;
+        }
+        onSave(items);
+        onClose();
     };
 
     return (
         <div className="settings-overlay">
             <div className="settings-modal">
-                <h2>Configurações do Jogo da Roleta</h2>
+                <h2>Configurações da Roleta</h2>
                 <div className="item-add-form">
-                    <h3>Adicionar/Editar Item (Máximo 11)</h3>
+                    <h3>{editingIndex !== null ? 'Editar Item' : 'Adicionar Item'} (Máx: 11)</h3>
                     <div className="input-group">
                         <input
                             type="text"
-                            value={newItem}
-                            onChange={(e) => setNewItem(e.target.value)}
-                            placeholder="Nome do Item"
+                            value={newItemText}
+                            onChange={(e) => setNewItemText(e.target.value)}
+                            placeholder="Texto do item"
                         />
                         {editingIndex !== null ? (
-                            <button onClick={() => handleUpdateItem(editingIndex)}>Salvar Edição</button>
+                            <>
+                                <button onClick={handleUpdateItem}>Atualizar</button>
+                                <button className="cancel-edit-button" onClick={() => { setEditingIndex(null); setNewItemText(''); }}>Cancelar</button>
+                            </>
                         ) : (
                             <button onClick={handleAddItem} disabled={items.length >= 11}>Adicionar</button>
                         )}
@@ -75,7 +89,7 @@ const Settings = ({ onSave, initialItems, onClose }) => {
                 </div>
 
                 <div className="settings-actions">
-                    <button className="save-button" onClick={() => onSave(items)}>Salvar e Fechar</button>
+                    <button className="save-button" onClick={handleSaveAndClose}>Salvar e Fechar</button>
                     <button className="cancel-button" onClick={onClose}>Cancelar</button>
                 </div>
             </div>
