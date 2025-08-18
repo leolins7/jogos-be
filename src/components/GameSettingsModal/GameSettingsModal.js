@@ -33,6 +33,7 @@ const GameSettingsModal = ({ onClose }) => {
                         <option value="/jogo-do-perfil">Jogo do Perfil</option>
                         <option value="/jogo-da-memoria">Jogo da Memória</option>
                         <option value="/acerte-ou-saia">Acerte ou Saia</option>
+                        <option value="/jogo-da-roleta">Roleta</option>
                         <option value="/sete-erros" disabled>07 Sete Erros (em breve)</option>
                     </select>
                 </div>

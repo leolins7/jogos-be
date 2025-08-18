@@ -1,0 +1,134 @@
+/* src/components/JogoDaRoleta/Settings.css */
+
+.settings-overlay {
+    position: fixed;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    background-color: rgba(0, 0, 0, 0.7);
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    z-index: 1000;
+}
+
+.settings-modal {
+    background-color: #fff;
+    padding: 30px;
+    border-radius: 10px;
+    box-shadow: 0 8px 16px rgba(0, 0, 0, 0.2);
+    width: 90%;
+    max-width: 700px;
+    max-height: 90vh;
+    overflow-y: auto;
+    text-align: center;
+}
+
+.settings-modal h2 {
+    color: var(--be-eventos-blue);
+    margin-bottom: 25px;
+    font-size: 2em;
+}
+
+.item-add-form {
+    margin-bottom: 25px;
+}
+
+.item-add-form h3 {
+    margin-bottom: 10px;
+    color: var(--be-eventos-blue);
+}
+
+.input-group {
+    display: flex;
+    gap: 10px;
+}
+
+.input-group input {
+    flex-grow: 1;
+    padding: 10px;
+    border: 1px solid #ccc;
+    border-radius: 5px;
+    font-size: 1em;
+}
+
+.input-group button {
+    background-color: var(--be-eventos-green);
+    color: white;
+    padding: 10px 15px;
+    border: none;
+    border-radius: 5px;
+    cursor: pointer;
+    transition: background-color 0.3s ease;
+}
+
+.input-group button:hover {
+    background-color: #218838;
+}
+
+.items-list {
+    text-align: left;
+}
+
+.items-list h3 {
+    margin-bottom: 10px;
+    color: var(--be-eventos-blue);
+}
+
+.items-list ul {
+    list-style: none;
+    padding: 0;
+    max-height: 200px;
+    overflow-y: auto;
+    border: 1px solid #eee;
+    border-radius: 5px;
+    margin-bottom: 20px;
+    text-align: left;
+}
+
+.items-list li {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    padding: 10px 15px;
+    border-bottom: 1px solid #eee;
+    color: var(--be-eventos-text);
+}
+
+.item-actions button {
+    background: none;
+    border: none;
+    cursor: pointer;
+    color: var(--be-eventos-blue);
+    transition: color 0.2s ease;
+}
+
+.item-actions button:hover {
+    color: #0056b3;
+}
+
+.settings-actions {
+    margin-top: 20px;
+    display: flex;
+    justify-content: center;
+    gap: 15px;
+}
+
+.settings-actions button {
+    padding: 12px 25px;
+    border: none;
+    border-radius: 5px;
+    cursor: pointer;
+    font-size: 1.1em;
+}
+
+.settings-actions .save-button {
+    background-color: var(--be-eventos-blue);
+    color: white;
+}
+
+.settings-actions .cancel-button {
+    background-color: #6c757d;
+    color: white;
+}

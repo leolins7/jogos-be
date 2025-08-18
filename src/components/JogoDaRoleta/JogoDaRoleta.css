@@ -1,0 +1,213 @@
+/* src/components/JogoDaRoleta/JogoDaRoleta.css */
+
+/* Variáveis de cores */
+:root {
+    --be-eventos-blue: #2d559a;
+    --be-eventos-yellow: #f1b302;
+    --be-eventos-green: #28a745;
+    --be-eventos-red: #dc3545;
+    --be-eventos-text: #333;
+    --be-eventos-light-bg: #f9f9f9;
+}
+
+body {
+    background-color: #2c3e50;
+    font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+    color: var(--be-eventos-text);
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    min-height: 100vh;
+    margin: 0;
+}
+
+.game-container {
+    background-color: #ffffff;
+    padding: 30px;
+    border-radius: 10px;
+    box-shadow: 0 5px 15px rgba(0, 0, 0, 0.2);
+    width: 90%;
+    max-width: 800px;
+    margin: 40px auto;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    transition: all 0.3s ease;
+    position: relative;
+    text-align: center;
+}
+
+.home-button {
+    position: absolute;
+    top: 15px;
+    left: 15px;
+    background-color: transparent;
+    border: none;
+    cursor: pointer;
+    width: 30px;
+    height: 30px;
+    background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24' fill='none' stroke='%23666' stroke-width='2' stroke-linecap='round' stroke-linejoin='round'%3E%3Cpath d='M3 9l9-7 9 7v11a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2z'%3E%3C/path%3E%3Cpolyline points='9 22 9 12 15 12 15 22'%3E%3C/polyline%3E%3C/svg%3E");
+    background-size: contain;
+    background-repeat: no-repeat;
+    background-position: center;
+    transition: transform 0.3s ease;
+}
+
+.home-button:hover {
+    transform: scale(1.1);
+}
+
+.settings-button {
+    position: absolute;
+    top: 15px;
+    right: 15px;
+    background-color: transparent;
+    border: none;
+    cursor: pointer;
+    width: 30px;
+    height: 30px;
+    background-image: url("data:image/svg+xml,%3Csvg version='1.0' xmlns='http://www.w3.org/2000/svg' width='1280.000000pt' height='1280.000000pt' viewBox='0 0 1280.000000 1280.000000' preserveAspectRatio='xMidYMid meet'%3E%3Cmetadata%3ECreated by potrace 1.15, written by Peter Selinger 2001-2017%3C/metadata%3E%3Cg transform='translate(0.000000,1280.000000) scale(0.100000,-0.100000)' fill='%23666' stroke='none'%3E%3Cpath d='M6010 12794 c-25 -2 -103 -9 -175 -15 -143 -12 -390 -49 -503 -74 l-72 -17 0 -529 0 -530 -139 -207 c-158 -234 -272 -376 -371 -461 -174 -150 -329 -225 -570 -277 -67 -15 -129 -18 -290 -18 -216 0 -338 13 -540 59 l-103 23 -366 366 -367 367 -139 -112 c-409 -327 -760 -689 -1070 -1102 l-58 -78 355 -357 356 -357 40 -105 c99 -258 137 -439 137 -655 0 -152 -9 -214 -47 -339 -97 -315 -393 -608 -871 -861 l-104 -55 -510 0 c-437 0 -512 -2 -516 -14 -10 -26 -55 -336 -69 -471 -8 -82 -13 -266 -12 -495 0 -373 10 -553 54 -954 11 -99 20 -183 20 -188 0 -4 227 -8 504 -8 l503 0 84 -34 c417 -169 661 -374 800 -672 141 -299 140 -732 -2 -1218 l-21 -71 -356 -357 -356 -357 27 -40 c45 -68 219 -281 350 -427 251 -282 517 -537 771 -740 l130 -105 371 371 371 370 79 10 c142 17 511 23 645 11 434 -40 741 -184 989 -464 75 -86 193 -261 250 -373 l41 -81 0 -525 0 -525 103 -16 c144 -23 406 -54 577 -69 189 -17 765 -16 935 0 137 14 468 59 498 68 16 5 17 39 17 538 l0 532 46 95 c141 290 366 525 634 659 117 59 291 114 445 141 113 20 164 23 385 24 154 0 302 -5 375 -14 l120 -13 397 -400 398 -401 37 29 c85 63 356 286 468 384 302 265 573 556 755 813 l34 48 -397 397 -397 397 -34 170 c-59 293 -70 384 -70 585 -1 143 4 204 18 270 48 220 136 387 291 549 142 149 293 255 533 375 l132 66 575 0 575 0 5 23 c7 35 34 248 50 407 52 515 43 1075 -26 1529 -11 75 -22 144 -25 154 -5 16 -42 17 -589 17 l-584 0 -128 64 c-540 271 -784 609 -818 1136 -10 155 22 485 75 760 l10 55 405 405 405 405 -64 93 c-205 303 -507 614 -872 897 -182 143 -372 278 -382 273 -5 -1 -184 -174 -396 -383 -279 -274 -397 -384 -424 -393 -20 -8 -100 -27 -177 -43 -747 -155 -1306 99 -1725 786 l-60 99 0 553 c0 455 -2 553 -13 553 -8 0 -94 9 -193 20 -364 40 -536 51 -829 54 -165 2 -320 2 -345 0z m725 -4200 c242 -29 482 -102 720 -219 252 -124 440 -260 636 -461 291 -300 495 -679 589 -1095 65 -289 67 -678 4 -964 -181 -817 -764 -1463 -1548 -1714 -241 -77 -425 -105 -691 -105 -372 0 -669 68 -1000 229 -332 161 -616 393 -826 675 -113 152 -159 227 -239 392 -117 239 -193 507 -221 777 -16 153 -6 431 20 586 123 727 562 1329 1214 1665 420 217 856 293 1342 234z'/%3E%3C/g%3E%3C/svg%3E");
+    background-size: contain;
+    background-repeat: no-repeat;
+    background-position: center;
+    transition: transform 0.3s ease;
+}
+
+.settings-button:hover {
+    transform: rotate(90deg);
+}
+
+.be-logo {
+    max-width: 200px;
+    height: auto;
+    margin-bottom: 20px;
+}
+
+.game-title {
+    font-size: 2.5em;
+    color: var(--be-eventos-blue);
+    margin-bottom: 20px;
+    font-weight: bold;
+}
+
+.roulette-wrapper {
+    position: relative;
+    width: 400px;
+    height: 400px;
+    margin: 30px auto;
+}
+
+.roulette {
+    position: relative;
+    width: 100%;
+    height: 100%;
+    border-radius: 50%;
+    overflow: hidden;
+    box-shadow: inset 0 0 15px rgba(0, 0, 0, 0.2);
+    border: 5px solid #ccc;
+    /* A roleta agora usa os segmentos como filhos posicionados de forma absoluta. */
+}
+
+.roulette-segment {
+    position: absolute;
+    top: 0;
+    left: 50%;
+    width: 50%;
+    height: 50%;
+    transform-origin: 0% 100%;
+    overflow: hidden;
+}
+
+.segment-content {
+    position: absolute;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-weight: bold;
+    color: white;
+    text-shadow: 1px 1px 2px rgba(0, 0, 0, 0.5);
+    padding: 10px;
+    box-sizing: border-box;
+    text-align: center;
+    word-wrap: break-word;
+}
+
+.roulette-center {
+    position: absolute;
+    top: 50%;
+    left: 50%;
+    transform: translate(-50%, -50%);
+    width: 100px;
+    height: 100px;
+    background-color: #fff;
+    border-radius: 50%;
+    box-shadow: 0 0 10px rgba(0, 0, 0, 0.3);
+    z-index: 10;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+}
+
+.center-logo {
+    max-width: 80%;
+    max-height: 80%;
+    object-fit: contain;
+}
+
+.roulette-pointer {
+    position: absolute;
+    top: -15px;
+    left: 50%;
+    transform: translateX(-50%);
+    width: 0;
+    height: 0;
+    border-left: 15px solid transparent;
+    border-right: 15px solid transparent;
+    border-top: 25px solid var(--be-eventos-green);
+    z-index: 20;
+}
+
+.game-controls {
+    margin-top: 30px;
+}
+
+.spin-button {
+    padding: 15px 40px;
+    background-color: var(--be-eventos-yellow);
+    color: var(--be-eventos-text);
+    font-size: 1.5em;
+    font-weight: bold;
+    border: none;
+    border-radius: 10px;
+    cursor: pointer;
+    transition: background-color 0.3s ease, transform 0.2s ease, box-shadow 0.3s ease;
+    box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+}
+
+.spin-button:hover:not(:disabled) {
+    background-color: #e0a800;
+    transform: translateY(-3px);
+    box-shadow: 0 6px 12px rgba(0, 0, 0, 0.2);
+}
+
+.spin-button:disabled {
+    background-color: #cccccc;
+    cursor: not-allowed;
+    transform: none;
+    box-shadow: none;
+}
+
+.result-display {
+    margin-top: 30px;
+    font-size: 1.5em;
+    font-weight: bold;
+    color: var(--be-eventos-blue);
+    background-color: #e0f7fa;
+    padding: 15px 25px;
+    border-radius: 8px;
+    box-shadow: 0 2px 5px rgba(0, 0, 0, 0.1);
+}

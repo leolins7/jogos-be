@@ -17,11 +17,11 @@ const GameHub = () => {
         <Link to="/jogo-da-memoria" className="game-card">
           Jogo da Memória
         </Link>
-        <Link to="/sete-erros" className="game-card coming-soon">
-          07 Sete Erros (em breve)
-        </Link>
         <Link to="/acerte-ou-saia" className="game-card">
           Acerte ou Saia
+        </Link>
+        <Link to="/jogo-da-roleta" className="game-card">
+          Jogo da Roleta
         </Link>
       </div>
     </div>
