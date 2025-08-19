@@ -32,7 +32,7 @@ function App() {
           <Route path="/acerte-ou-saia" element={<ProtectedRoute><JogoDoAcerteOuSaia /></ProtectedRoute>} />
           <Route path="/jogo-da-roleta" element={<ProtectedRoute><JogoDaRoleta /></ProtectedRoute>} />
           <Route path="/sete-erros" element={<ProtectedRoute><h1>Jogo dos 7 Erros em construção!</h1></ProtectedRoute>} />
-          <Route path="*" element={<Navigate to="/login" replace />} /> {/* Redireciona qualquer outra rota para o login */}
+          <Route path="*" element={<Navigate to="/login" replace />} />
         </Routes>
       </div>
     </Router>

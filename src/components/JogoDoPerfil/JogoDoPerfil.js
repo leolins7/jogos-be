@@ -154,7 +154,7 @@ const JogoDoPerfil = () => {
 
     return (
         <div className="game-container">
-            <Link to="/games-hub" className="home-button"></Link>
+            <Link to="/home" className="home-button"></Link>
             <button className="settings-button" onClick={() => setShowSettings(true)}></button>
             <img src={beLogo} alt="Be Eventos Logo" className="be-logo" />
 

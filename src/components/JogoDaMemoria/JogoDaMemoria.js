@@ -88,7 +88,7 @@ const JogoDaMemoria = () => {
 
     return (
         <div className="memory-game-container">
-            <Link to="/games-hub" className="home-button"></Link>
+            <Link to="/home" className="home-button"></Link>
             <button className="settings-button" onClick={() => setShowSettings(true)}></button>
 
             <h1 className="game-title">Jogo da Memória</h1>
