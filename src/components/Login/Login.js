@@ -1,15 +1,39 @@
 import React, { useState } from 'react';
+import { useNavigate } from 'react-router-dom';
 import beLogo from '../assets/logo.png';
 import './Login.css';
 
 const Login = () => {
     const [username, setUsername] = useState('');
     const [password, setPassword] = useState('');
+    const [error, setError] = useState('');
+    const navigate = useNavigate();
 
-    const handleSubmit = (e) => {
+    const handleSubmit = async (e) => {
         e.preventDefault();
-        // Lógica de autenticação será implementada aqui
-        console.log('Tentativa de login com:', { username, password });
+        setError('');
+
+        try {
+            const response = await fetch('/api/login', {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/json',
+                },
+                body: JSON.stringify({ username, password }),
+            });
+
+            const data = await response.json();
+
+            if (data.success) {
+                // Armazena o status de login (em um projeto real, seria um token JWT)
+                localStorage.setItem('isLoggedIn', 'true');
+                navigate('/home');
+            } else {
+                setError('Usuário ou senha inválidos.');
+            }
+        } catch (err) {
+            setError('Ocorreu um erro ao tentar fazer login. Tente novamente.');
+        }
     };
 
     return (
@@ -18,6 +42,7 @@ const Login = () => {
                 <img src={beLogo} alt="Be Eventos Logo" className="login-logo" />
                 <h1 className="login-title">Acesso Restrito</h1>
                 <form onSubmit={handleSubmit} className="login-form">
+                    {error && <p className="error-message">{error}</p>}
                     <div className="input-group">
                         <label htmlFor="username">Usuário</label>
                         <input
