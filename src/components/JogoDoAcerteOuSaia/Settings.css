@@ -139,3 +139,62 @@
 .settings-actions .cancel-button:hover {
     background-color: #5a6268;
 }
+
+/* Adicione estes estilos ao final do arquivo Settings.css */
+
+.settings-section {
+    margin-bottom: 20px;
+    padding-bottom: 20px;
+    border-bottom: 1px solid #eee;
+}
+
+.settings-section:last-of-type {
+    border-bottom: none;
+    padding-bottom: 0;
+}
+
+.settings-modal h3 {
+    color: var(--be-eventos-blue);
+    margin-bottom: 15px;
+}
+
+.settings-modal h4 {
+    color: var(--be-eventos-text);
+    margin-bottom: 15px;
+}
+
+.theme-selection-settings {
+    display: flex;
+    flex-direction: column;
+    gap: 10px;
+}
+
+.theme-selection-settings .theme-button {
+    padding: 10px 15px;
+    font-size: 1em;
+    font-weight: bold;
+    color: white;
+    background-color: var(--be-eventos-blue);
+    border: none;
+    border-radius: 5px;
+    cursor: pointer;
+    transition: background-color 0.3s ease;
+}
+
+.theme-selection-settings .theme-button:hover {
+    background-color: #264b85;
+}
+
+.theme-selection-settings .theme-button.edit-theme {
+    background-color: var(--be-eventos-green);
+}
+
+.theme-selection-settings .theme-button.edit-theme:hover {
+    background-color: #218838;
+}
+
+.separator {
+    border: none;
+    border-top: 1px solid #ccc;
+    margin: 20px 0;
+}
