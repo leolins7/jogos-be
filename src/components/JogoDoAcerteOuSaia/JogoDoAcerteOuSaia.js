@@ -53,7 +53,11 @@ const JogoDoAcerteOuSaia = () => {
         if (gameActive || gameEnded) {
             const colorIndex = currentPhraseIndex % BACKGROUND_COLORS.length;
             document.body.style.backgroundColor = BACKGROUND_COLORS[colorIndex];
+        } else {
+            // Garante que a cor de fundo seja restaurada ao voltar para a seleção de temas
+            document.body.style.backgroundColor = originalBodyColor.current;
         }
+        
         return () => {
             document.body.style.backgroundColor = originalBodyColor.current;
         };
@@ -121,14 +125,6 @@ const JogoDoAcerteOuSaia = () => {
             setGameEnded(true);
         }
     };
-
-    const handleBackToMenu = () => {
-        setThemeToPlay('');
-        setCurrentPhraseIndex(0);
-        setGameEnded(false);
-        setGameActive(false);
-        document.body.style.backgroundColor = originalBodyColor.current;
-    };
     
     const handleSaveSettings = (updatedPhrases) => {
         setAllPhrasesByTheme(updatedPhrases);
@@ -145,7 +141,6 @@ const JogoDoAcerteOuSaia = () => {
         if (!currentPhrase) return '';
         const word = currentPhrase.word;
         if (showFullWord) return word;
-        // ... (resto da lógica do useMemo permanece a mesma)
         const wordLength = word.length;
         const hintChars = Array(wordLength).fill('_');
         for (let i = 0; i < wordLength; i++) {
@@ -175,7 +170,17 @@ const JogoDoAcerteOuSaia = () => {
         return hintChars.join(' ');
     }, [currentPhrase, showFullWord]);
 
-    const renderContent = () => {
+    const renderMainContent = () => {
+        if (gameEnded) {
+            return (
+                <div className="end-game-container">
+                    <h2 className="end-game-message">Parabéns, você completou o tema!</h2>
+                    <Link to="/" className="next-phrase-button">Voltar ao Início</Link>
+                    <p className="prevention-footer">Vamos juntos compartilhar prevenção</p>
+                </div>
+            );
+        }
+
         if (gameActive || showFullWord) {
             return (
                 <>
@@ -197,17 +202,7 @@ const JogoDoAcerteOuSaia = () => {
             );
         }
         
-        if (gameEnded) {
-            return (
-                <div className="end-game-container">
-                    <h2 className="end-game-message">Parabéns, você completou o tema!</h2>
-                    <button className="next-phrase-button" onClick={handleBackToMenu}>Jogar Novamente</button>
-                    <p className="prevention-footer">Vamos juntos compartilhar prevenção</p>
-                </div>
-            );
-        }
-
-        // Tela inicial
+        // Tela inicial para seleção de tema e início
         return (
             <div className="start-screen">
                 <h2>{themeToPlay ? `Tema: ${themeToPlay}` : 'Nenhum tema selecionado'}</h2>
@@ -226,7 +221,7 @@ const JogoDoAcerteOuSaia = () => {
             <button className="settings-button" onClick={() => setShowSettings(true)}></button>
             <img src={beLogo} alt="Be Eventos Logo" className="be-logo" />
             <h1 className="game-title">Acerte ou Saia</h1>
-            {renderContent()}
+            {renderMainContent()}
             {showSettings && (
                 <Settings
                     onSave={handleSaveSettings}
