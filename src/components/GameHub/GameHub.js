@@ -7,7 +7,7 @@ import './GameHub.css';
 const GameHub = () => {
     return (
         <div className="games-container">
-            <Link to="/home" className="home-button-gameshub"></Link>
+            <Link to="/home" className="home-button"></Link>
             <LogoutButton />
             <img src={beLogo} alt="Be Eventos Logo" className="be-logo" />
             <h1 className="games-title">Central de Jogos</h1>
