@@ -1,35 +1,28 @@
 import React, { useState } from 'react';
-import { Link, useNavigate } from 'react-router-dom';
+import { Link } from 'react-router-dom';
 import beLogo from '../assets/logo.png';
 import GameSettingsModal from '../GameSettingsModal/GameSettingsModal';
 import './Home.css';
 
 const Home = () => {
-    const [isSettingsModalOpen, setIsSettingsModalOpen] = useState(false);
-    const navigate = useNavigate();
+  const [showModal, setShowModal] = useState(false);
 
-    const handleStartGame = () => {
-        const savedGame = localStorage.getItem('selectedGame');
-        if (savedGame) {
-            navigate(savedGame);
-        } else {
-            alert('Por favor, selecione um jogo nas configurações antes de iniciar.');
-        }
-    };
-
-    return (
-        <div className="home-container">
-            <Link to="/games-hub" className="hub-button">Central</Link>
-            <button className="settings-button" onClick={() => setIsSettingsModalOpen(true)}></button>
-
-            <div className="home-content">
-                <img src={beLogo} alt="Be Eventos Logo" className="home-logo" />
-                <button className="start-game-button" onClick={handleStartGame}>Iniciar Jogo</button>
-            </div>
-
-            {isSettingsModalOpen && <GameSettingsModal onClose={() => setIsSettingsModalOpen(false)} />}
-        </div>
-    );
+  return (
+    <div className="home-container">
+      <div className="home-content">
+        <img src={beLogo} alt="Be Eventos Logo" className="logo-image" />
+        <h1 className="main-title">Seja Bem-Vindo!</h1>
+        <p className="subtitle">Selecione um jogo para começar.</p>
+        <Link to="/games-hub" className="start-button">
+          Iniciar Jogo
+        </Link>
+        <button className="settings-button-home" onClick={() => setShowModal(true)}>
+          <span className="settings-icon"></span>
+        </button>
+      </div>
+      {showModal && <GameSettingsModal onClose={() => setShowModal(false)} />}
+    </div>
+  );
 };
 
 export default Home;
