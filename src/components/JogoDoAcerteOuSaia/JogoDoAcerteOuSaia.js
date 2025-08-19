@@ -175,7 +175,7 @@ const JogoDoAcerteOuSaia = () => {
             return (
                 <div className="end-game-container">
                     <h2 className="end-game-message">Parabéns, você completou o tema!</h2>
-                    <Link to="/" className="next-phrase-button">Voltar ao Início</Link>
+                    <Link to="/home" className="next-phrase-button">Voltar ao Início</Link>
                     <p className="prevention-footer">Vamos juntos compartilhar prevenção</p>
                 </div>
             );
