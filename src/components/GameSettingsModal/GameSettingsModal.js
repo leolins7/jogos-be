@@ -10,7 +10,7 @@ const GameSettingsModal = ({ onClose }) => {
             setSelectedGame(savedGame);
         } else {
             // Define um jogo padrão se não houver um salvo
-            setSelectedGame('/jogo-do-perfil');
+            setSelectedGame('/acerte-ou-saia');
         }
     }, []);
 
@@ -30,11 +30,8 @@ const GameSettingsModal = ({ onClose }) => {
                 <div className="game-selection">
                     <h3>Selecione o Jogo:</h3>
                     <select value={selectedGame} onChange={(e) => setSelectedGame(e.target.value)}>
-                        <option value="/jogo-do-perfil">Jogo do Perfil</option>
                         <option value="/jogo-da-memoria">Jogo da Memória</option>
                         <option value="/acerte-ou-saia">Acerte ou Saia</option>
-                        <option value="/jogo-da-roleta">Roleta</option>
-                        <option value="/sete-erros" disabled>07 Sete Erros (em breve)</option>
                     </select>
                 </div>
                 <div className="modal-actions">

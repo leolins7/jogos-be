@@ -13,17 +13,11 @@ const GameHub = () => {
       <h1 className="hub-title">Central de Jogos</h1>
       <p className="hub-subtitle">Selecione um jogo para começar:</p>
       <div className="games-list">
-        <Link to="/jogo-do-perfil" className="game-card">
-          Jogo do Perfil
-        </Link>
         <Link to="/jogo-da-memoria" className="game-card">
           Jogo da Memória
         </Link>
         <Link to="/acerte-ou-saia" className="game-card">
           Acerte ou Saia
-        </Link>
-        <Link to="/jogo-da-roleta" className="game-card">
-          Jogo da Roleta
         </Link>
       </div>
     </div>

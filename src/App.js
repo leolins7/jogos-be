@@ -27,11 +27,8 @@ function App() {
           <Route path="/login" element={<Login />} />
           <Route path="/home" element={<ProtectedRoute><Home /></ProtectedRoute>} />
           <Route path="/games-hub" element={<ProtectedRoute><GameHub /></ProtectedRoute>} />
-          <Route path="/jogo-do-perfil" element={<ProtectedRoute><JogoDoPerfil /></ProtectedRoute>} />
           <Route path="/jogo-da-memoria" element={<ProtectedRoute><JogoDaMemoria /></ProtectedRoute>} />
           <Route path="/acerte-ou-saia" element={<ProtectedRoute><JogoDoAcerteOuSaia /></ProtectedRoute>} />
-          <Route path="/jogo-da-roleta" element={<ProtectedRoute><JogoDaRoleta /></ProtectedRoute>} />
-          <Route path="/sete-erros" element={<ProtectedRoute><h1>Jogo dos 7 Erros em construção!</h1></ProtectedRoute>} />
           <Route path="*" element={<Navigate to="/login" replace />} />
         </Routes>
       </div>
