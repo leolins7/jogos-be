@@ -15,7 +15,7 @@ body {
 .memory-game-container {
     padding: 30px;
     /* Adicionada a nova cor de fundo */
-    background-color: #f0f4f8; 
+    background-color: #f8f9fa; 
     border-radius: 10px;
     box-shadow: 0 5px 15px rgba(0, 0, 0, 0.2);
     width: 90%;
