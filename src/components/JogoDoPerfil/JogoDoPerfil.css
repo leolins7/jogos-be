@@ -9,16 +9,6 @@
     --be-eventos-light-bg: #f9f9f9;
 }
 
-body {
-    background-color: #2c3e50;
-    font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
-    color: var(--be-eventos-text);
-    display: flex;
-    justify-content: center;
-    align-items: center;
-    min-height: 100vh;
-    margin: 0;
-}
 
 .game-container {
     background-color: #ffffff;
