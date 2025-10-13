@@ -1,8 +1,9 @@
 .login-container {
+    /* As linhas conflitantes foram removidas daqui */
     display: flex;
     justify-content: center;
     align-items: center;
-    min-height: 100vh;
+    width: 100%; /* Garante que o container ocupe a largura disponível */
     font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
 }
 
