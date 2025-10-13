@@ -90,3 +90,11 @@
     transform: translateY(-3px);
     box-shadow: 0 6px 12px rgba(0, 0, 0, 0.2);
 }
+
+.prevention-footer {
+    margin-top: 40px;
+    font-size: 1.2em;
+    color: var(--be-eventos-text);
+    font-weight: bold;
+    opacity: 0.9;
+}

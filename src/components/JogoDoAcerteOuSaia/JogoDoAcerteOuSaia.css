@@ -139,7 +139,8 @@ body {
 
 .word-hint-display.revealed {
     letter-spacing: normal;
-    font-size: 2em;
+    /* Aumentado de 2em para 2.5em para melhor visibilidade */
+    font-size: 2.5em; 
     word-break: break-word;
     line-height: 1.2;
 }
@@ -485,4 +486,12 @@ body {
 .change-theme-button:hover {
     background-color: var(--be-eventos-blue);
     color: white;
+}
+
+.prevention-footer {
+    margin-top: 40px;
+    font-size: 1.2em;
+    color: var(--be-eventos-text);
+    font-weight: bold;
+    opacity: 0.9;
 }

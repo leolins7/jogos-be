@@ -111,7 +111,7 @@ const JogoDaMemoria = () => {
                     </div>
                 ))}
             </div>
-
+            <p className="prevention-footer">Vamos Juntos Compartilhar Prevenção</p>
             {showSettings && (
                 <Settings 
                     onSave={handleSaveSettings}

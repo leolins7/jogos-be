@@ -25,6 +25,7 @@ const Home = () => {
             <div className="home-content">
                 <img src={beLogo} alt="Be Eventos Logo" className="home-logo" />
                 <button className="start-game-button" onClick={handleStartGame}>Iniciar Jogo</button>
+                <p className="prevention-footer">Vamos Juntos Compartilhar Prevenção</p>
             </div>
 
             {isSettingsModalOpen && <GameSettingsModal onClose={() => setIsSettingsModalOpen(false)} />}
