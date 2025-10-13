@@ -87,7 +87,7 @@ const JogoDaMemoria = () => {
     const isSixBySix = gridSize === '6x6';
 
     return (
-        <div className="memory-game-container">
+        <div className="memory-game-container" style={{ maxWidth: '1500px' }}>
             <Link to="/home" className="home-button"></Link>
             <button className="settings-button" onClick={() => setShowSettings(true)}></button>
 

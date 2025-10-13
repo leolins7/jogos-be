@@ -13,8 +13,7 @@
     border-radius: 10px;
     box-shadow: 0 5px 15px rgba(0, 0, 0, 0.2);
     width: 90%;
-    /* LARGURA AUMENTADA */
-    max-width: 1500px;
+    /* A propriedade max-width foi movida para o estilo inline no componente JS */
     margin: 40px auto;
     position: relative;
 }
@@ -73,7 +72,6 @@
     padding: 10px;
 }
 
-/* Ajuste para grids maiores */
 @media (min-width: 768px) {
     .memory-grid {
         justify-content: center;
