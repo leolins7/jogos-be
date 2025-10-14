@@ -1,38 +1,42 @@
+// src/components/Login/Login.js
+
 import React, { useState } from 'react';
 import { useNavigate } from 'react-router-dom';
 import beLogo from '../assets/logo.png';
 import './Login.css';
+import { supabase } from '../../supabaseClient'; // Importe o cliente Supabase
 
 const Login = () => {
-    const [username, setUsername] = useState('');
+    const [email, setEmail] = useState(''); // Usaremos email para o login
     const [password, setPassword] = useState('');
     const [error, setError] = useState('');
+    const [loading, setLoading] = useState(false);
     const navigate = useNavigate();
 
     const handleSubmit = async (e) => {
         e.preventDefault();
         setError('');
+        setLoading(true);
 
         try {
-            const response = await fetch('/api/login', {
-                method: 'POST',
-                headers: {
-                    'Content-Type': 'application/json',
-                },
-                body: JSON.stringify({ username, password }),
+            // Use a função de login do Supabase
+            const { error } = await supabase.auth.signInWithPassword({
+                email: email,
+                password: password,
             });
 
-            const data = await response.json();
-
-            if (data.success) {
-                // Armazena o status de login (em um projeto real, seria um token JWT)
-                localStorage.setItem('isLoggedIn', 'true');
-                navigate('/home');
-            } else {
-                setError('Usuário ou senha inválidos.');
+            if (error) {
+                throw error;
             }
+
+            // Se o login for bem-sucedido, o Supabase gerencia a sessão.
+            localStorage.setItem('isLoggedIn', 'true');
+            navigate('/home');
+
         } catch (err) {
-            setError('Ocorreu um erro ao tentar fazer login. Tente novamente.');
+            setError(err.message || 'Usuário ou senha inválidos.');
+        } finally {
+            setLoading(false);
         }
     };
 
@@ -44,12 +48,12 @@ const Login = () => {
                 <form onSubmit={handleSubmit} className="login-form">
                     {error && <p className="error-message">{error}</p>}
                     <div className="input-group">
-                        <label htmlFor="username">Usuário</label>
+                        <label htmlFor="email">Email</label>
                         <input
-                            type="text"
-                            id="username"
-                            value={username}
-                            onChange={(e) => setUsername(e.target.value)}
+                            type="email"
+                            id="email"
+                            value={email}
+                            onChange={(e) => setEmail(e.target.value)}
                             required
                         />
                     </div>
@@ -63,7 +67,9 @@ const Login = () => {
                             required
                         />
                     </div>
-                    <button type="submit" className="login-button">Entrar</button>
+                    <button type="submit" className="login-button" disabled={loading}>
+                        {loading ? 'Entrando...' : 'Entrar'}
+                    </button>
                 </form>
             </div>
         </div>
