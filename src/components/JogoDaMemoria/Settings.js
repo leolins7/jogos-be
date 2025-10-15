@@ -1,69 +1,90 @@
 import React, { useState, useEffect } from 'react';
+import { supabase } from '../../supabaseClient'; // 1. Importe o Supabase
 
 const Settings = ({ onSave, initialCardContent, initialGridSize, onClose }) => {
     const [cardPairs, setCardPairs] = useState([]);
     const [newText, setNewText] = useState('');
     const [editingPair, setEditingPair] = useState(null);
     const [gridSize, setGridSize] = useState(initialGridSize);
+    const [loading, setLoading] = useState(false);
 
+    // 2. Extrai os pares únicos do conteúdo inicial
     useEffect(() => {
-        if (!initialCardContent || initialCardContent.length === 0) {
-            setCardPairs([]);
-            return;
-        }
-
-        const pairs = [];
-        for (let i = 0; i < initialCardContent.length; i += 2) {
-            pairs.push({
-                id: initialCardContent[i].matchId,
-                text: initialCardContent[i].text,
-            });
-        }
-        setCardPairs(pairs);
+        const uniquePairs = initialCardContent.reduce((acc, current) => {
+            if (!acc.find(item => item.id === current.matchId)) {
+                acc.push({ id: current.matchId, text: current.text });
+            }
+            return acc;
+        }, []);
+        setCardPairs(uniquePairs);
     }, [initialCardContent]);
 
-    const handleAddPair = () => {
-        if (newText.trim() !== '') {
-            const newId = cardPairs.length > 0 ? Math.max(...cardPairs.map(p => p.id), 0) + 1 : 1;
-            const newPair = { id: newId, text: newText.trim() };
-            setCardPairs([...cardPairs, newPair]);
+    // 3. Adiciona um novo par no banco de dados
+    const handleAddPair = async () => {
+        if (newText.trim() === '') return;
+        setLoading(true);
+
+        const { data, error } = await supabase
+            .from('memory_card_pairs')
+            .insert([{ text: newText.trim() }])
+            .select();
+
+        if (error) {
+            console.error('Erro ao adicionar par:', error);
+        } else if (data) {
+            setCardPairs([...cardPairs, data[0]]);
             setNewText('');
         }
+        setLoading(false);
     };
 
-    const handleRemovePair = (idToRemove) => {
-        setCardPairs(cardPairs.filter(pair => pair.id !== idToRemove));
+    // 4. Remove um par do banco de dados
+    const handleRemovePair = async (idToRemove) => {
+        setLoading(true);
+        const { error } = await supabase
+            .from('memory_card_pairs')
+            .delete()
+            .match({ id: idToRemove });
+
+        if (error) {
+            console.error('Erro ao remover par:', error);
+        } else {
+            setCardPairs(cardPairs.filter(pair => pair.id !== idToRemove));
+        }
+        setLoading(false);
     };
 
+    // Prepara para edição
     const handleEditPair = (pair) => {
         setEditingPair(pair);
         setNewText(pair.text);
     };
 
-    const handleUpdatePair = () => {
-        if (newText.trim() !== '' && editingPair) {
-            const updatedPairs = cardPairs.map(pair =>
-                pair.id === editingPair.id ? { ...pair, text: newText.trim() } : pair
-            );
+    // 5. Atualiza um par no banco de dados
+    const handleUpdatePair = async () => {
+        if (newText.trim() === '' || !editingPair) return;
+        setLoading(true);
+
+        const { data, error } = await supabase
+            .from('memory_card_pairs')
+            .update({ text: newText.trim() })
+            .match({ id: editingPair.id })
+            .select();
+
+        if (error) {
+            console.error('Erro ao atualizar par:', error);
+        } else if (data) {
+            const updatedPairs = cardPairs.map(p => (p.id === editingPair.id ? data[0] : p));
             setCardPairs(updatedPairs);
             setNewText('');
             setEditingPair(null);
         }
+        setLoading(false);
     };
-
+    
+    // 6. Passa os dados atualizados para o componente pai e fecha
     const handleSave = () => {
-        const savedContent = cardPairs.flatMap(pair => [
-            { id: (pair.id * 2) - 1, matchId: pair.id, text: pair.text, color: "var(--be-eventos-blue)" },
-            { id: (pair.id * 2), matchId: pair.id, text: pair.text, color: "var(--be-eventos-yellow)" },
-        ]);
-
-        if (savedContent.length === 0) {
-            alert('Adicione pelo menos um par de cartas!');
-            return;
-        }
-
-        onSave(savedContent, gridSize);
-        onClose();
+        onSave(cardPairs, gridSize);
     };
 
     return (
@@ -74,9 +95,9 @@ const Settings = ({ onSave, initialCardContent, initialGridSize, onClose }) => {
                 <div className="grid-size-config">
                     <h3>Tamanho do Tabuleiro:</h3>
                     <select className="grid-size-select" value={gridSize} onChange={(e) => setGridSize(e.target.value)}>
-                        <option value="4x4">4 x 4 (16 cartas)</option>
-                        <option value="5x4">5 x 4 (20 cartas)</option>
-                        <option value="6x6">6 x 6 (36 cartas)</option>
+                        <option value="4x4">4 x 4 (até 8 pares)</option>
+                        <option value="5x4">5 x 4 (até 10 pares)</option>
+                        <option value="6x6">6 x 6 (até 18 pares)</option>
                     </select>
                 </div>
 
@@ -89,9 +110,10 @@ const Settings = ({ onSave, initialCardContent, initialGridSize, onClose }) => {
                             value={newText}
                             onChange={(e) => setNewText(e.target.value)}
                             onKeyDown={(e) => e.key === 'Enter' && (editingPair ? handleUpdatePair() : handleAddPair())}
+                            disabled={loading}
                         />
-                        <button onClick={editingPair ? handleUpdatePair : handleAddPair}>
-                            {editingPair ? "Atualizar Par" : "Adicionar Par"}
+                        <button onClick={editingPair ? handleUpdatePair : handleAddPair} disabled={loading}>
+                            {editingPair ? "Atualizar" : "Adicionar"}
                         </button>
                     </div>
 
@@ -100,8 +122,8 @@ const Settings = ({ onSave, initialCardContent, initialGridSize, onClose }) => {
                             <li key={pair.id}>
                                 <span>{pair.text}</span>
                                 <div className="pair-actions">
-                                    <button onClick={() => handleEditPair(pair)}>Editar</button>
-                                    <button onClick={() => handleRemovePair(pair.id)}>Remover</button>
+                                    <button onClick={() => handleEditPair(pair)} disabled={loading}>Editar</button>
+                                    <button onClick={() => handleRemovePair(pair.id)} disabled={loading}>Remover</button>
                                 </div>
                             </li>
                         ))}
@@ -109,8 +131,7 @@ const Settings = ({ onSave, initialCardContent, initialGridSize, onClose }) => {
                 </div>
                 
                 <div className="settings-actions">
-                    <button className="save-button" onClick={handleSave}>Salvar</button>
-                    <button className="cancel-button" onClick={onClose}>Cancelar</button>
+                    <button className="save-button" onClick={handleSave}>Salvar e Fechar</button>
                 </div>
             </div>
         </div>
