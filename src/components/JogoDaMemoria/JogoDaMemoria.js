@@ -2,18 +2,9 @@ import React, { useState, useEffect } from 'react';
 import { Link } from 'react-router-dom';
 import Settings from './Settings';
 import './JogoDaMemoria.css';
+import { supabase } from '../../supabaseClient'; // Importe o Supabase
 
-const DEFAULT_CARD_CONTENT = [
-    { id: 1, matchId: 1, text: "EPI", color: "var(--be-eventos-yellow)" },
-    { id: 2, matchId: 1, text: "EPI", color: "var(--be-eventos-yellow)" },
-    { id: 3, matchId: 2, text: "CIPA", color: "var(--be-eventos-blue)" },
-    { id: 4, matchId: 2, text: "CIPA", color: "var(--be-eventos-blue)" },
-    { id: 5, matchId: 3, text: "Riscos", color: "var(--be-eventos-yellow)" },
-    { id: 6, matchId: 3, text: "Riscos", color: "var(--be-eventos-yellow)" },
-    { id: 7, matchId: 4, text: "NR-10", color: "var(--be-eventos-blue)" },
-    { id: 8, matchId: 4, text: "NR-10", color: "var(--be-eventos-blue)" },
-];
-
+// Função para embaralhar as cartas (continua a mesma)
 const shuffleCards = (cards) => {
     const shuffledCards = [...cards];
     for (let i = shuffledCards.length - 1; i > 0; i--) {
@@ -23,30 +14,51 @@ const shuffleCards = (cards) => {
     return shuffledCards;
 };
 
-const JogoDaMemoria = () => {
-    const [cardContent, setCardContent] = useState(() => {
-        const savedContent = localStorage.getItem('memoryGameCards');
-        return savedContent ? JSON.parse(savedContent) : DEFAULT_CARD_CONTENT;
+// Nova função para formatar os pares vindos do banco
+const formatPairsToCards = (pairs) => {
+    return pairs.flatMap((pair, index) => {
+        const matchId = pair.id || index + 1;
+        return [
+            { id: (matchId * 2) - 1, matchId: matchId, text: pair.text, color: "var(--be-eventos-blue)" },
+            { id: (matchId * 2), matchId: matchId, text: pair.text, color: "var(--be-eventos-yellow)" },
+        ];
     });
+};
 
-    const [gridSize, setGridSize] = useState(() => {
-        const savedGrid = localStorage.getItem('memoryGameGrid');
-        return savedGrid ? savedGrid : '4x4';
-    });
-    
+const JogoDaMemoria = () => {
+    const [cardContent, setCardContent] = useState([]);
+    const [gridSize, setGridSize] = useState('4x4'); // Pode vir do Supabase no futuro
+
     const [cards, setCards] = useState([]);
     const [flippedCards, setFlippedCards] = useState([]);
     const [matchedCards, setMatchedCards] = useState([]);
     const [gameActive, setGameActive] = useState(false);
     const [showSettings, setShowSettings] = useState(false);
+    const [loading, setLoading] = useState(true); // Estado de carregamento
 
+    // useEffect para buscar os dados do Supabase
     useEffect(() => {
-        if (cardContent.length > 0) {
-             setCards(shuffleCards(cardContent));
-             setGameActive(true);
-        }
-    }, [cardContent]);
+        const fetchCardPairs = async () => {
+            setLoading(true);
+            const { data: pairs, error } = await supabase
+                .from('memory_card_pairs')
+                .select('id, text');
 
+            if (error) {
+                console.error('Erro ao buscar pares de cartas:', error);
+            } else {
+                const formattedCards = formatPairsToCards(pairs);
+                setCardContent(formattedCards);
+                setCards(shuffleCards(formattedCards));
+                setGameActive(true);
+            }
+            setLoading(false);
+        };
+
+        fetchCardPairs();
+    }, []);
+
+    // Lógica do jogo (continua a mesma)
     useEffect(() => {
         if (flippedCards.length === 2) {
             const [firstIndex, secondIndex] = flippedCards;
@@ -54,37 +66,42 @@ const JogoDaMemoria = () => {
                 setMatchedCards([...matchedCards, cards[firstIndex].matchId]);
                 setFlippedCards([]);
             } else {
-                setTimeout(() => {
-                    setFlippedCards([]);
-                }, 1000);
+                setTimeout(() => setFlippedCards([]), 1000);
             }
         }
     }, [flippedCards, cards, matchedCards]);
-    
+
     useEffect(() => {
-        if (matchedCards.length > 0 && matchedCards.length === cardContent.length / 2) {
+        if (cardContent.length > 0 && matchedCards.length === cardContent.length / 2) {
             setGameActive(false);
-            // Removido o alertbox
         }
     }, [matchedCards, cardContent]);
-    
+
     const handleCardClick = (index) => {
         if (!gameActive || flippedCards.includes(index) || matchedCards.includes(cards[index].matchId)) {
             return;
         }
         setFlippedCards([...flippedCards, index]);
     };
-
+    
+    // ATENÇÃO: A lógica de salvar nas configurações precisará ser atualizada
+    // para interagir com o Supabase. Faremos isso no próximo passo.
     const handleSaveSettings = (newContent, newGrid) => {
-        setCardContent(newContent);
+        // Por enquanto, vamos apenas atualizar o estado local
+        const formattedCards = formatPairsToCards(newContent);
+        setCardContent(formattedCards);
+        setCards(shuffleCards(formattedCards));
         setGridSize(newGrid);
-        localStorage.setItem('memoryGameCards', JSON.stringify(newContent));
-        localStorage.setItem('memoryGameGrid', newGrid);
         setShowSettings(false);
+        // Lógica para salvar no Supabase virá aqui
     };
 
     const gridColumns = gridSize.split('x')[0];
     const isSixBySix = gridSize === '6x6';
+
+    if (loading) {
+        return <div>Carregando jogo...</div>;
+    }
 
     return (
         <div className="memory-game-container" style={{ maxWidth: '1500px' }}>
@@ -92,11 +109,11 @@ const JogoDaMemoria = () => {
             <button className="settings-button" onClick={() => setShowSettings(true)}></button>
 
             <h1 className="game-title">Jogo da Memória</h1>
-            
+
             <div className={`memory-grid ${isSixBySix ? 'grid-6x6' : ''}`} style={{ gridTemplateColumns: `repeat(${gridColumns}, 1fr)` }}>
                 {cards.map((card, index) => (
-                    <div 
-                        key={index} 
+                    <div
+                        key={index}
                         className={`card ${flippedCards.includes(index) || matchedCards.includes(card.matchId) ? 'flipped' : ''}`}
                         onClick={() => handleCardClick(index)}
                     >
@@ -113,7 +130,7 @@ const JogoDaMemoria = () => {
             </div>
             <p className="prevention-footer">Vamos Juntos Compartilhar Prevenção</p>
             {showSettings && (
-                <Settings 
+                <Settings
                     onSave={handleSaveSettings}
                     initialCardContent={cardContent}
                     initialGridSize={gridSize}
