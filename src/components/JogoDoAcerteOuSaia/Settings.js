@@ -1,56 +1,93 @@
 import React, { useState, useEffect } from 'react';
+import { supabase } from '../../supabaseClient'; // Importe o Supabase
 import './Settings.css';
 
 const Settings = ({ onSave, initialData, onClose, themes, onSelectTheme }) => {
+    // Estados do seu componente original, mantidos para controlar a UI
     const [phrasesByTheme, setPhrasesByTheme] = useState(initialData);
     const [themeToEdit, setThemeToEdit] = useState('');
-
     const [newPhraseText, setNewPhraseText] = useState('');
     const [newWordText, setNewWordText] = useState('');
-    const [editingIndex, setEditingIndex] = useState(null);
+    
+    // Estado para controlar a edição (usando o objeto da frase em vez do índice)
+    const [editingPhrase, setEditingPhrase] = useState(null); 
+    const [loading, setLoading] = useState(false); // Para desabilitar botões durante o carregamento
 
-    const isEditing = editingIndex !== null;
+    const isEditing = editingPhrase !== null;
 
+    // Efeito para preencher os inputs ao clicar em "Editar"
     useEffect(() => {
-        if (isEditing && themeToEdit && phrasesByTheme[themeToEdit]) {
-            const phrase = phrasesByTheme[themeToEdit][editingIndex];
-            setNewPhraseText(phrase.phrase);
-            setNewWordText(phrase.word);
+        if (isEditing) {
+            setNewPhraseText(editingPhrase.phrase);
+            setNewWordText(editingPhrase.word);
         } else {
             setNewPhraseText('');
             setNewWordText('');
         }
-    }, [editingIndex, themeToEdit, phrasesByTheme]);
+    }, [editingPhrase]);
 
-    const handleAddOrUpdatePhrase = () => {
-        if (newPhraseText.trim() === '' || newWordText.trim() === '') {
-            alert('Por favor, preencha a frase e a palavra.');
-            return;
+    // Função para ADICIONAR uma nova frase no Supabase
+    const handleAddPhrase = async () => {
+        if (!newPhraseText.trim() || !newWordText.trim() || !themeToEdit) return;
+        setLoading(true);
+
+        const { data, error } = await supabase
+            .from('guess_or_leave_phrases')
+            .insert([{ theme: themeToEdit, phrase: newPhraseText.trim(), word: newWordText.trim() }])
+            .select();
+
+        if (error) {
+            console.error('Erro ao adicionar frase:', error);
+        } else if (data) {
+            const updatedPhrases = { ...phrasesByTheme };
+            updatedPhrases[themeToEdit] = [...(updatedPhrases[themeToEdit] || []), data[0]];
+            setPhrasesByTheme(updatedPhrases);
+            setNewPhraseText('');
+            setNewWordText('');
         }
+        setLoading(false);
+    };
+    
+    // Função para ATUALIZAR uma frase existente no Supabase
+    const handleUpdatePhrase = async () => {
+        if (!newPhraseText.trim() || !newWordText.trim() || !isEditing) return;
+        setLoading(true);
 
-        const newPhrase = {
-            theme: themeToEdit,
-            phrase: newPhraseText.trim(),
-            word: newWordText.trim()
-        };
+        const { data, error } = await supabase
+            .from('guess_or_leave_phrases')
+            .update({ phrase: newPhraseText.trim(), word: newWordText.trim() })
+            .match({ id: editingPhrase.id })
+            .select();
 
-        const updatedPhrases = [...(phrasesByTheme[themeToEdit] || [])];
-
-        if (isEditing) {
-            updatedPhrases[editingIndex] = newPhrase;
-        } else {
-            updatedPhrases.push(newPhrase);
+        if (error) {
+            console.error('Erro ao atualizar frase:', error);
+        } else if (data) {
+            const updatedPhrases = { ...phrasesByTheme };
+            const phraseIndex = updatedPhrases[themeToEdit].findIndex(p => p.id === editingPhrase.id);
+            if (phraseIndex !== -1) {
+                updatedPhrases[themeToEdit][phraseIndex] = data[0];
+                setPhrasesByTheme(updatedPhrases);
+            }
+            setEditingPhrase(null); // Limpa o estado de edição
         }
-
-        setPhrasesByTheme({ ...phrasesByTheme, [themeToEdit]: updatedPhrases });
-        setNewPhraseText('');
-        setNewWordText('');
-        setEditingIndex(null);
+        setLoading(false);
     };
 
-    const handleRemovePhrase = (indexToRemove) => {
-        const updatedPhrases = (phrasesByTheme[themeToEdit] || []).filter((_, index) => index !== indexToRemove);
-        setPhrasesByTheme({ ...phrasesByTheme, [themeToEdit]: updatedPhrases });
+    // Função para REMOVER uma frase do Supabase pelo seu ID
+    const handleRemovePhrase = async (idToRemove) => {
+        setLoading(true);
+        const { error } = await supabase
+            .from('guess_or_leave_phrases')
+            .delete()
+            .match({ id: idToRemove });
+
+        if (error) {
+            console.error('Erro ao remover frase:', error);
+        } else {
+            const updatedPhrases = (phrasesByTheme[themeToEdit] || []).filter(p => p.id !== idToRemove);
+            setPhrasesByTheme({ ...phrasesByTheme, [themeToEdit]: updatedPhrases });
+        }
+        setLoading(false);
     };
 
     const handleSaveAndClose = () => {
@@ -60,10 +97,10 @@ const Settings = ({ onSave, initialData, onClose, themes, onSelectTheme }) => {
 
     return (
         <div className="settings-overlay">
+            {/* O JSX abaixo é a estrutura do SEU componente, garantindo que o CSS funcione */}
             <div className="settings-modal">
                 <h2>Configurações</h2>
                 
-                {/* Seção para selecionar o tema para jogar */}
                 <div className="settings-section">
                     <h3>Selecionar Tema para Jogar</h3>
                     <div className="theme-selection-settings">
@@ -77,7 +114,6 @@ const Settings = ({ onSave, initialData, onClose, themes, onSelectTheme }) => {
 
                 <hr className="separator" />
 
-                {/* Seção para editar as frases de um tema */}
                 <div className="settings-section">
                     <h3>Editar Frases por Tema</h3>
                     {!themeToEdit ? (
@@ -92,43 +128,45 @@ const Settings = ({ onSave, initialData, onClose, themes, onSelectTheme }) => {
                     ) : (
                         <>
                             <h4>Editando: {themeToEdit}</h4>
-                            <div className="phrase-add-form">
+                            <div className="phrase-add-form"> {/* Verifique se esta classe existe no seu CSS */}
                                 <div className="phrase-input-group">
                                     <input
                                         type="text"
                                         placeholder="Frase ou Dica"
                                         value={newPhraseText}
                                         onChange={(e) => setNewPhraseText(e.target.value)}
+                                        disabled={loading}
                                     />
                                     <input
                                         type="text"
                                         placeholder="Palavra Chave"
                                         value={newWordText}
                                         onChange={(e) => setNewWordText(e.target.value)}
+                                        disabled={loading}
                                     />
                                 </div>
-                                <button onClick={handleAddOrUpdatePhrase}>
+                                <button onClick={isEditing ? handleUpdatePhrase : handleAddPhrase} disabled={loading}>
                                     {isEditing ? 'Atualizar Frase' : 'Adicionar Frase'}
                                 </button>
                                 {isEditing && (
-                                    <button className="cancel-button" onClick={() => setEditingIndex(null)}>Cancelar Edição</button>
+                                    <button className="cancel-button" onClick={() => setEditingPhrase(null)} disabled={loading}>Cancelar Edição</button>
                                 )}
                             </div>
 
                             <div className="phrases-list">
                                 <ul>
-                                    {(phrasesByTheme[themeToEdit] || []).map((item, index) => (
-                                        <li key={index}>
+                                    {(phrasesByTheme[themeToEdit] || []).map((item) => (
+                                        <li key={item.id}> {/* Usando o ID do banco como chave */}
                                             <span>"{item.phrase}" - <strong>{item.word}</strong></span>
                                             <div className="phrase-actions">
-                                                <button onClick={() => setEditingIndex(index)}>Editar</button>
-                                                <button onClick={() => handleRemovePhrase(index)}>Remover</button>
+                                                <button onClick={() => setEditingPhrase(item)} disabled={loading}>Editar</button>
+                                                <button onClick={() => handleRemovePhrase(item.id)} disabled={loading}>Remover</button>
                                             </div>
                                         </li>
                                     ))}
                                 </ul>
                             </div>
-                            <button className="back-button" onClick={() => setThemeToEdit('')}>Voltar para Temas</button>
+                            <button className="back-button" onClick={() => setThemeToEdit('')}>Voltar para Temas</button> {/* Verifique se esta classe existe */}
                         </>
                     )}
                 </div>
