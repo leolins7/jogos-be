@@ -1,40 +1,17 @@
 import React, { useState, useEffect, useRef, useMemo } from 'react';
-import { Link } from 'react-router-dom';
+import { Link, useNavigate } from 'react-router-dom';
 import Settings from './Settings';
 import './JogoDoAcerteOuSaia.css';
 import beLogo from '../assets/logo.png';
-
-const DEFAULT_PHRASES = {
-    "Saúde": [
-        { phrase: "Preserva sua audição em ambientes com ruído excessivo.", word: "Protetor auricular" },
-        { phrase: "Prática de lavar as mãos para evitar doenças.", word: "Higiene" }
-    ],
-    "Segurança do Trabalho": [
-        { phrase: "Protege sua cabeça contra impactos e objetos que caem em canteiros de obra.", word: "Capacete" },
-        { phrase: "Usado para proteger as mãos contra cortes, abrasões e produtos químicos.", word: "Luvas" },
-        { phrase: "Item essencial que resguarda seus olhos de partículas, respingos e poeira.", word: "Óculos de segurança" },
-        { phrase: "Evita quedas em trabalhos realizados em altura e mantém você preso a um ponto seguro.", word: "Cinto de segurança" },
-        { phrase: "Calçado robusto que protege os pés contra esmagamentos, perfurações e choques elétricos.", word: "Botina de segurança" }
-    ],
-    "Meio Ambiente": [
-        { phrase: "Processo de converter resíduos em novos materiais.", word: "Reciclagem" },
-        { phrase: "Ato de proteger as florestas contra o desmatamento.", word: "Preservação" }
-    ],
-    "Trânsito": [
-        { phrase: "Dispositivo para visualizar obstáculos e demarcar áreas perigosas.", word: "Fita zebrada" },
-        { phrase: "Sinalização usada para alertar sobre perigos na via.", word: "Cone" }
-    ]
-};
+import { supabase } from '../../supabaseClient';
 
 const INITIAL_TIME = 30;
 const BACKGROUND_COLORS = ['#2d559a', '#f1b302', '#28a745'];
-const THEMES = ["Saúde", "Segurança do Trabalho", "Meio Ambiente", "Trânsito"];
 
 const JogoDoAcerteOuSaia = () => {
-    const [allPhrasesByTheme, setAllPhrasesByTheme] = useState(() => {
-        const savedPhrases = localStorage.getItem('acerteOuSaiaThemedPhrases');
-        return savedPhrases ? JSON.parse(savedPhrases) : DEFAULT_PHRASES;
-    });
+    const [allPhrasesByTheme, setAllPhrasesByTheme] = useState({});
+    const [themes, setThemes] = useState([]);
+    const [loading, setLoading] = useState(true);
 
     const [themeToPlay, setThemeToPlay] = useState('');
     const [phrasesForCurrentGame, setPhrasesForCurrentGame] = useState([]);
@@ -48,13 +25,40 @@ const JogoDoAcerteOuSaia = () => {
 
     const timerIntervalRef = useRef(null);
     const originalBodyColor = useRef(document.body.style.backgroundColor);
+    const navigate = useNavigate();
+
+    useEffect(() => {
+        const fetchGameData = async () => {
+            setLoading(true);
+            const { data, error } = await supabase
+                .from('guess_or_leave_phrases')
+                .select('id, theme, phrase, word');
+
+            if (error) {
+                console.error('Erro ao buscar frases:', error);
+                setMessage('Não foi possível carregar os dados do jogo.');
+            } else {
+                const themesData = [...new Set(data.map(p => p.theme))].sort();
+                const phrasesByTheme = data.reduce((acc, current) => {
+                    acc[current.theme] = acc[current.theme] || [];
+                    acc[current.theme].push(current);
+                    return acc;
+                }, {});
+
+                setThemes(themesData);
+                setAllPhrasesByTheme(phrasesByTheme);
+            }
+            setLoading(false);
+        };
+
+        fetchGameData();
+    }, []);
 
     useEffect(() => {
         if (gameActive || gameEnded) {
             const colorIndex = currentPhraseIndex % BACKGROUND_COLORS.length;
             document.body.style.backgroundColor = BACKGROUND_COLORS[colorIndex];
         } else {
-            // Garante que a cor de fundo seja restaurada ao voltar para a seleção de temas
             document.body.style.backgroundColor = originalBodyColor.current;
         }
         
@@ -89,10 +93,11 @@ const JogoDoAcerteOuSaia = () => {
 
     const handleSelectThemeToPlay = (theme) => {
         setThemeToPlay(theme);
+        setGameEnded(false);
         const phrasesForTheme = allPhrasesByTheme[theme] || [];
         setPhrasesForCurrentGame(phrasesForTheme);
         setMessage(phrasesForTheme.length === 0 ? 'Este tema não possui frases. Adicione frases ou escolha outro tema.' : '');
-        setShowSettings(false); // Fecha o modal após selecionar o tema
+        setShowSettings(false);
     };
     
     const startGame = () => {
@@ -126,11 +131,12 @@ const JogoDoAcerteOuSaia = () => {
         }
     };
     
-    const handleSaveSettings = (updatedPhrases) => {
-        setAllPhrasesByTheme(updatedPhrases);
-        localStorage.setItem('acerteOuSaiaThemedPhrases', JSON.stringify(updatedPhrases));
+    const handleSaveSettings = (updatedPhrasesByTheme) => {
+        setAllPhrasesByTheme(updatedPhrasesByTheme);
+        const themesData = [...new Set(Object.values(updatedPhrasesByTheme).flat().map(p => p.theme))].sort();
+        setThemes(themesData);
         if (themeToPlay) {
-            setPhrasesForCurrentGame(updatedPhrases[themeToPlay] || []);
+            setPhrasesForCurrentGame(updatedPhrasesByTheme[themeToPlay] || []);
         }
     };
 
@@ -171,11 +177,17 @@ const JogoDoAcerteOuSaia = () => {
     }, [currentPhrase, showFullWord]);
 
     const renderMainContent = () => {
+        if (loading) {
+            return <h2>Carregando...</h2>;
+        }
+
         if (gameEnded) {
             return (
                 <div className="end-game-container">
                     <h2 className="end-game-message">Parabéns, você completou o tema!</h2>
-                    <Link to="/home" className="next-phrase-button">Voltar ao Início</Link>
+                    <button className="next-phrase-button" onClick={() => navigate('/home')}>
+                        Voltar ao Início
+                    </button>
                     <p className="prevention-footer">Vamos juntos compartilhar prevenção</p>
                 </div>
             );
@@ -202,7 +214,7 @@ const JogoDoAcerteOuSaia = () => {
             );
         }
         
-        // Tela inicial para seleção de tema e início
+        // AJUSTE AQUI: Voltamos à tela inicial original
         return (
             <div className="start-screen">
                 <h2>{themeToPlay ? `Tema: ${themeToPlay}` : 'Nenhum tema selecionado'}</h2>
@@ -227,7 +239,7 @@ const JogoDoAcerteOuSaia = () => {
                     onSave={handleSaveSettings}
                     initialData={allPhrasesByTheme}
                     onClose={() => setShowSettings(false)}
-                    themes={THEMES}
+                    themes={themes}
                     onSelectTheme={handleSelectThemeToPlay}
                 />
             )}
