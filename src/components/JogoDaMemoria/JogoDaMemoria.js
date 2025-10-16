@@ -1,10 +1,11 @@
-import React, { useState, useEffect } from 'react';
+// A linha abaixo está corrigida
+import React, { useState, useEffect } from 'react'; 
 import { Link } from 'react-router-dom';
 import Settings from './Settings';
 import './JogoDaMemoria.css';
-import { supabase } from '../../supabaseClient'; // Importe o Supabase
+import { supabase } from '../../supabaseClient';
+import { getDataFromDB, saveDataToDB } from '../../utils/db';
 
-// Função para embaralhar as cartas (continua a mesma)
 const shuffleCards = (cards) => {
     const shuffledCards = [...cards];
     for (let i = shuffledCards.length - 1; i > 0; i--) {
@@ -14,7 +15,6 @@ const shuffleCards = (cards) => {
     return shuffledCards;
 };
 
-// Nova função para formatar os pares vindos do banco
 const formatPairsToCards = (pairs) => {
     return pairs.flatMap((pair, index) => {
         const matchId = pair.id || index + 1;
@@ -27,38 +27,52 @@ const formatPairsToCards = (pairs) => {
 
 const JogoDaMemoria = () => {
     const [cardContent, setCardContent] = useState([]);
-    const [gridSize, setGridSize] = useState('4x4'); // Pode vir do Supabase no futuro
-
+    const [gridSize, setGridSize] = useState('4x4');
     const [cards, setCards] = useState([]);
     const [flippedCards, setFlippedCards] = useState([]);
     const [matchedCards, setMatchedCards] = useState([]);
     const [gameActive, setGameActive] = useState(false);
     const [showSettings, setShowSettings] = useState(false);
-    const [loading, setLoading] = useState(true); // Estado de carregamento
+    const [loading, setLoading] = useState(true);
 
-    // useEffect para buscar os dados do Supabase
     useEffect(() => {
         const fetchCardPairs = async () => {
             setLoading(true);
-            const { data: pairs, error } = await supabase
-                .from('memory_card_pairs')
-                .select('id, text');
+            try {
+                const { data: pairs, error } = await supabase
+                    .from('memory_card_pairs')
+                    .select('id, text');
 
-            if (error) {
-                console.error('Erro ao buscar pares de cartas:', error);
-            } else {
+                if (error) throw error; 
+
+                console.log("Jogo da Memória: Dados buscados do Supabase (Online)");
                 const formattedCards = formatPairsToCards(pairs);
                 setCardContent(formattedCards);
                 setCards(shuffleCards(formattedCards));
+                
+                await saveDataToDB('memory_card_pairs', pairs);
+
+            } catch (error) {
+                console.warn("Jogo da Memória: Falha na rede. Buscando do cache local (IndexedDB)...");
+                const cachedPairs = await getDataFromDB('memory_card_pairs');
+
+                if (cachedPairs && cachedPairs.length > 0) {
+                    console.log("Jogo da Memória: Dados carregados do cache local!");
+                    const formattedCards = formatPairsToCards(cachedPairs);
+                    setCardContent(formattedCards);
+                    setCards(shuffleCards(formattedCards));
+                } else {
+                    console.error("Não foi possível carregar os dados do Jogo da Memória. Sem conexão e sem cache.");
+                }
+            } finally {
                 setGameActive(true);
+                setLoading(false);
             }
-            setLoading(false);
         };
 
         fetchCardPairs();
     }, []);
-
-    // Lógica do jogo (continua a mesma)
+    
     useEffect(() => {
         if (flippedCards.length === 2) {
             const [firstIndex, secondIndex] = flippedCards;
@@ -84,16 +98,14 @@ const JogoDaMemoria = () => {
         setFlippedCards([...flippedCards, index]);
     };
     
-    // ATENÇÃO: A lógica de salvar nas configurações precisará ser atualizada
-    // para interagir com o Supabase. Faremos isso no próximo passo.
-    const handleSaveSettings = (newContent, newGrid) => {
-        // Por enquanto, vamos apenas atualizar o estado local
-        const formattedCards = formatPairsToCards(newContent);
+    const handleSaveSettings = async (newPairs, newGrid) => {
+        const formattedCards = formatPairsToCards(newPairs);
         setCardContent(formattedCards);
         setCards(shuffleCards(formattedCards));
         setGridSize(newGrid);
         setShowSettings(false);
-        // Lógica para salvar no Supabase virá aqui
+        
+        await saveDataToDB('memory_card_pairs', newPairs);
     };
 
     const gridColumns = gridSize.split('x')[0];
@@ -107,9 +119,7 @@ const JogoDaMemoria = () => {
         <div className="memory-game-container" style={{ maxWidth: '1500px' }}>
             <Link to="/home" className="home-button"></Link>
             <button className="settings-button" onClick={() => setShowSettings(true)}></button>
-
             <h1 className="game-title">Jogo da Memória</h1>
-
             <div className={`memory-grid ${isSixBySix ? 'grid-6x6' : ''}`} style={{ gridTemplateColumns: `repeat(${gridColumns}, 1fr)` }}>
                 {cards.map((card, index) => (
                     <div
