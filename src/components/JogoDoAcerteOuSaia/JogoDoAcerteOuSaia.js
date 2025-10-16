@@ -4,15 +4,17 @@ import Settings from './Settings';
 import './JogoDoAcerteOuSaia.css';
 import beLogo from '../assets/logo.png';
 import { supabase } from '../../supabaseClient';
+// 1. Importe as funções do nosso arquivo de banco de dados local
+import { getDataFromDB, saveDataToDB } from '../../utils/db';
 
 const INITIAL_TIME = 30;
 const BACKGROUND_COLORS = ['#2d559a', '#f1b302', '#28a745'];
 
 const JogoDoAcerteOuSaia = () => {
+    // ... (toda a seção de estados permanece a mesma)
     const [allPhrasesByTheme, setAllPhrasesByTheme] = useState({});
     const [themes, setThemes] = useState([]);
     const [loading, setLoading] = useState(true);
-
     const [themeToPlay, setThemeToPlay] = useState('');
     const [phrasesForCurrentGame, setPhrasesForCurrentGame] = useState([]);
     const [timer, setTimer] = useState(INITIAL_TIME);
@@ -22,38 +24,58 @@ const JogoDoAcerteOuSaia = () => {
     const [showSettings, setShowSettings] = useState(false);
     const [showFullWord, setShowFullWord] = useState(false);
     const [gameEnded, setGameEnded] = useState(false);
-
     const timerIntervalRef = useRef(null);
     const originalBodyColor = useRef(document.body.style.backgroundColor);
     const navigate = useNavigate();
 
+    // 2. Lógica de busca de dados ATUALIZADA com cache
     useEffect(() => {
         const fetchGameData = async () => {
             setLoading(true);
-            const { data, error } = await supabase
-                .from('guess_or_leave_phrases')
-                .select('id, theme, phrase, word');
+            try {
+                // Tenta buscar online
+                const { data, error } = await supabase
+                    .from('guess_or_leave_phrases')
+                    .select('id, theme, phrase, word');
+                if (error) throw error;
 
-            if (error) {
-                console.error('Erro ao buscar frases:', error);
-                setMessage('Não foi possível carregar os dados do jogo.');
-            } else {
-                const themesData = [...new Set(data.map(p => p.theme))].sort();
-                const phrasesByTheme = data.reduce((acc, current) => {
-                    acc[current.theme] = acc[current.theme] || [];
-                    acc[current.theme].push(current);
-                    return acc;
-                }, {});
+                console.log("Acerte ou Saia: Dados buscados do Supabase (Online)");
+                
+                // Salva os dados frescos no cache local
+                await saveDataToDB('guess_or_leave_phrases', data);
+                processFetchedData(data);
 
-                setThemes(themesData);
-                setAllPhrasesByTheme(phrasesByTheme);
+            } catch (error) {
+                // Se falhar, busca do cache
+                console.warn("Acerte ou Saia: Falha na rede. Buscando do cache local (IndexedDB)...");
+                const cachedData = await getDataFromDB('guess_or_leave_phrases');
+                if (cachedData && cachedData.length > 0) {
+                    console.log("Acerte ou Saia: Dados carregados do cache local!");
+                    processFetchedData(cachedData);
+                } else {
+                    console.error("Não foi possível carregar os dados do Acerte ou Saia. Sem conexão e sem cache.");
+                    setMessage('Não foi possível carregar os dados do jogo.');
+                }
+            } finally {
+                setLoading(false);
             }
-            setLoading(false);
+        };
+
+        const processFetchedData = (data) => {
+            const themesData = [...new Set(data.map(p => p.theme))].sort();
+            const phrasesByTheme = data.reduce((acc, current) => {
+                acc[current.theme] = acc[current.theme] || [];
+                acc[current.theme].push(current);
+                return acc;
+            }, {});
+            setThemes(themesData);
+            setAllPhrasesByTheme(phrasesByTheme);
         };
 
         fetchGameData();
     }, []);
 
+    // ... (o restante do seu código, outros useEffects e funções, permanece o mesmo)
     useEffect(() => {
         if (gameActive || gameEnded) {
             const colorIndex = currentPhraseIndex % BACKGROUND_COLORS.length;
@@ -61,7 +83,6 @@ const JogoDoAcerteOuSaia = () => {
         } else {
             document.body.style.backgroundColor = originalBodyColor.current;
         }
-        
         return () => {
             document.body.style.backgroundColor = originalBodyColor.current;
         };
@@ -131,13 +152,17 @@ const JogoDoAcerteOuSaia = () => {
         }
     };
     
-    const handleSaveSettings = (updatedPhrasesByTheme) => {
+    // 3. ATUALIZAÇÃO: Ao salvar as configurações, também atualizamos o cache local
+    const handleSaveSettings = async (updatedPhrasesByTheme) => {
         setAllPhrasesByTheme(updatedPhrasesByTheme);
-        const themesData = [...new Set(Object.values(updatedPhrasesByTheme).flat().map(p => p.theme))].sort();
+        const allPhrases = Object.values(updatedPhrasesByTheme).flat();
+        const themesData = [...new Set(allPhrases.map(p => p.theme))].sort();
         setThemes(themesData);
         if (themeToPlay) {
             setPhrasesForCurrentGame(updatedPhrasesByTheme[themeToPlay] || []);
         }
+        // Garante que o cache local tenha os dados mais recentes após a edição
+        await saveDataToDB('guess_or_leave_phrases', allPhrases);
     };
 
     const currentPhrase = phrasesForCurrentGame[currentPhraseIndex];
@@ -214,7 +239,6 @@ const JogoDoAcerteOuSaia = () => {
             );
         }
         
-        // AJUSTE AQUI: Voltamos à tela inicial original
         return (
             <div className="start-screen">
                 <h2>{themeToPlay ? `Tema: ${themeToPlay}` : 'Nenhum tema selecionado'}</h2>
