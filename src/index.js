@@ -1,10 +1,12 @@
 // src/index.js
+
 import React from 'react';
 import ReactDOM from 'react-dom/client';
 import './index.css';
 import App from './App';
 import reportWebVitals from './reportWebVitals';
-import * as serviceWorkerRegistration from './serviceWorkerRegistration'; // Importe o arquivo
+// Certifique-se de que a importação existe
+import * as serviceWorkerRegistration from './serviceWorkerRegistration';
 
 const root = ReactDOM.createRoot(document.getElementById('root'));
 root.render(
@@ -13,12 +15,9 @@ root.render(
   </React.StrictMode>
 );
 
-// If you want your app to work offline and load faster, you can change
-// unregister() to register() below. Note this comes with some pitfalls.
-// Learn more about service workers: https://cra.link/PWA
-serviceWorkerRegistration.register(); // Altere de unregister() para register()
+// Se você quer que seu app funcione offline e carregue mais rápido,
+// mude unregister() para register() abaixo.
+// Saiba mais sobre service workers: https://cra.link/PWA
+serviceWorkerRegistration.register(); // AQUI ESTÁ A MUDANÇA!
 
-// If you want to start measuring performance in your app, pass a function
-// to log results (for example: reportWebVitals(console.log))
-// or send to an analytics endpoint. Learn more: https://bit.ly/CRA-vitals
 reportWebVitals();
