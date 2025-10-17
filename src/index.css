@@ -19,3 +19,8 @@ code {
   font-family: source-code-pro, Menlo, Monaco, Consolas, 'Courier New',
     monospace;
 }
+
+/* Fundo exclusivo para o jogo da memória */
+body.memoria-background {
+  background-color: #B3E5FC; /* 👉 cor apenas enquanto o jogo está ativo */
+}

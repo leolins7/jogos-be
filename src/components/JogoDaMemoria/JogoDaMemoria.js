@@ -35,6 +35,14 @@ const JogoDaMemoria = () => {
     const [showSettings, setShowSettings] = useState(false);
     const [loading, setLoading] = useState(true);
 
+    // 🟦 altera o background geral apenas enquanto o jogo está ativo
+    useEffect(() => {
+        document.body.classList.add('memoria-background');
+        return () => {
+            document.body.classList.remove('memoria-background');
+        };
+    }, []);
+
     useEffect(() => {
         const fetchCardPairs = async () => {
             setLoading(true);
